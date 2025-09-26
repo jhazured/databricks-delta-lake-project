@@ -66,12 +66,12 @@ class SecurityConfig:
 class AppConfig:
     """Main application configuration."""
     environment: Environment
-    debug: bool = False
-    log_level: str = "INFO"
     database: DatabaseConfig
     databricks: DatabricksConfig
     monitoring: MonitoringConfig
     security: SecurityConfig
+    debug: bool = False
+    log_level: str = "INFO"
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
