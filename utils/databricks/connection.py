@@ -2,9 +2,11 @@
 Databricks connection management.
 """
 
-import requests
-from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+import requests
+
 from ..common.exceptions import APIError, ConfigurationError
 from ..common.logging import get_logger
 

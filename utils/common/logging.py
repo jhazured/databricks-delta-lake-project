@@ -2,11 +2,11 @@
 Logging utilities for the Delta Lake project.
 """
 
+import json
 import logging
 import sys
-from typing import Optional, Dict, Any
 from datetime import datetime
-import json
+from typing import Any, Dict, Optional
 
 
 def setup_logging(

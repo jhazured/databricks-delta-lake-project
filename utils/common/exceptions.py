@@ -2,7 +2,7 @@
 Custom exceptions for the Delta Lake project.
 """
 
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 
 class DeltaLakeError(Exception):

@@ -2,15 +2,16 @@
 Bronze layer data processing pipeline.
 """
 
-import pandas as pd
-from typing import Dict, Any, List, Optional
-from datetime import datetime
 import json
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from utils.common.logging import get_logger, log_performance
+import pandas as pd
+
 from utils.common.exceptions import DataProcessingError
-from utils.common.validation import DataValidator, validate_not_empty, validate_date
+from utils.common.logging import get_logger, log_performance
+from utils.common.validation import DataValidator, validate_date, validate_not_empty
 
 
 class BronzeLayerProcessor:

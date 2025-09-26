@@ -2,17 +2,18 @@
 FastAPI main application for Delta Lake project.
 """
 
-from fastapi import FastAPI, HTTPException, Depends, status
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+import uvicorn
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
-import uvicorn
-from datetime import datetime
 
-from utils.common.logging import get_logger, StructuredLogger
 from utils.common.config import get_config
-from utils.common.exceptions import DeltaLakeError, APIError
+from utils.common.exceptions import APIError, DeltaLakeError
+from utils.common.logging import StructuredLogger, get_logger
 
 # Initialize logging
 logger = get_logger(__name__)
