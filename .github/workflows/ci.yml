@@ -47,6 +47,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
+        echo "Verifying flake8 installation..."
+        python -c "import flake8; print('flake8 imported successfully')"
+        which flake8 || echo "flake8 not in PATH"
+        python -m flake8 --version || echo "python -m flake8 failed"
     
     - name: Lint with flake8
       run: |
