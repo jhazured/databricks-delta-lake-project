@@ -85,6 +85,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: [code-quality]
+    timeout-minutes: 30
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
@@ -143,12 +144,12 @@ jobs:
     
     - name: Run unit tests
       run: |
-        pytest testing/unit/ -v --cov=scripts --cov=utils --cov-report=xml --cov-report=term-missing
+        pytest testing/unit/ -v --cov=scripts --cov=utils --cov-report=xml --cov-report=term-missing --timeout=300
     
     - name: Run integration tests
       if: matrix.python-version == '3.11' && matrix.java-version == '11'
       run: |
-        pytest testing/integration/ -v -m "not slow"
+        pytest testing/integration/ -v -m "not slow" --timeout=300
       env:
         # Add test environment variables here
         TEST_MODE: "ci"
@@ -622,7 +623,7 @@ except Exception as e:
     
     - name: Run performance tests
       run: |
-        pytest testing/performance/ -v --benchmark-only --benchmark-save=performance-baseline
+        pytest testing/performance/ -v --benchmark-only --benchmark-save=performance-baseline --timeout=600
       env:
         TEST_MODE: "performance"
 
