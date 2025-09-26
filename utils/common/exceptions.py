@@ -9,7 +9,10 @@ class DeltaLakeError(Exception):
     """Base exception for Delta Lake project."""
 
     def __init__(
-        self, message: str, error_code: Optional[str] = None, details: Optional[Dict[str, Any]] = None
+        self,
+        message: str,
+        error_code: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
     ):
         """
         Initialize Delta Lake error.
