@@ -255,20 +255,7 @@ jobs:
         # Validate YAML syntax without requiring cluster connection
         for file in infrastructure/kubernetes/*.yaml; do
           echo "Validating YAML syntax for $file"
-          python -c "
-import yaml
-import sys
-try:
-    with open('$file', 'r') as f:
-        yaml.safe_load_all(f)
-    print('✅ YAML syntax is valid')
-except yaml.YAMLError as e:
-    print(f'❌ YAML syntax error: {e}')
-    sys.exit(1)
-except Exception as e:
-    print(f'❌ Error reading file: {e}')
-    sys.exit(1)
-"
+          python validate_yaml.py "$file"
         done
     
     - name: Check Kubernetes best practices
