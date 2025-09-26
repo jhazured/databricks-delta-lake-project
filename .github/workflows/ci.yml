@@ -259,25 +259,29 @@ jobs:
       with:
         terraform_version: '1.5.0'
     
+    # Check Terraform code formatting
     - name: Terraform Format Check
       run: |
         cd infrastructure/terraform
         terraform fmt -check -recursive
     
-    - name: Terraform Init
+    # Initialize Terraform without backend to avoid S3 state requirements
+    # This allows validation without needing actual AWS credentials or S3 bucket
+    - name: Terraform Init (No Backend)
       run: |
         cd infrastructure/terraform
         terraform init -backend=false
     
+    # Validate Terraform configuration syntax and structure
+    # This works after init -backend=false since no backend state is required
     - name: Terraform Validate
       run: |
         cd infrastructure/terraform
         terraform validate
     
-    - name: Terraform Plan (Dry Run)
-      run: |
-        cd infrastructure/terraform
-        terraform plan -var="databricks_host=test-host" -var="databricks_token=test-token" -var="environment=test"
+    # Note: We skip terraform plan in CI/CD since it requires real provider credentials
+    # The terraform validate step above is sufficient to check configuration syntax
+    # For actual deployment, terraform plan would be run with proper credentials
 
   # Performance testing
   performance:

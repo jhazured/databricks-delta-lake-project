@@ -93,3 +93,13 @@ site/
 # Backup files
 *.bak
 *.backup
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraformrc
+terraform.rc
