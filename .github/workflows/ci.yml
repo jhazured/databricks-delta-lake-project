@@ -63,7 +63,7 @@ jobs:
     
     - name: Type checking with mypy
       run: |
-        mypy utils/ scripts/ api/ --ignore-missing-imports
+        mypy utils/ scripts/ api/
     
     - name: Code analysis with pylint
       run: |
@@ -386,7 +386,7 @@ jobs:
       run: |
         echo "Testing Databricks connection utilities..."
         python -c "
-        from utils.databricks.connection import DatabricksConnection
+        from utils.databricks.connection import DatabricksConnection, DatabricksConfig
         from unittest.mock import Mock, patch
         
         # Mock the connection
@@ -397,10 +397,11 @@ jobs:
             mock_session.return_value.get.return_value = mock_response
             
             # Test connection initialization
-            conn = DatabricksConnection({
-                'host': 'https://test.databricks.com',
-                'token': 'test-token'
-            })
+            config = DatabricksConfig(
+                host='https://test.databricks.com',
+                token='test-token'
+            )
+            conn = DatabricksConnection(config)
             print('✅ Databricks connection utilities working correctly')
         "
     
