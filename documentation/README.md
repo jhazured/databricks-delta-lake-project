@@ -27,6 +27,7 @@ Welcome to the Databricks Delta Lake Project documentation. This directory conta
 ### 📖 User Guides
 - **[User Manual](./user-guides/)** - End-user documentation
 - **[Developer Guide](./developer-guides/)** - Development workflow and standards
+  - **[Type Checking with mypy](./developer-guides/type-checking-with-mypy.md)** - Comprehensive mypy guide with error explanations
 - **[Operations Guide](./operations/)** - Deployment and maintenance procedures
 
 ## 🎯 Quick Navigation
@@ -40,6 +41,7 @@ Welcome to the Databricks Delta Lake Project documentation. This directory conta
 1. Read [CI-CD-Workflow-Documentation.md](./CI-CD-Workflow-Documentation.md) for CI/CD details
 2. Review [Project Architecture](./architecture/) for system design
 3. Check [Developer Guide](./developer-guides/) for coding standards
+4. Learn [Type Checking with mypy](./developer-guides/type-checking-with-mypy.md) for type safety
 
 ### For DevOps/Operations
 1. Study [CI-CD-Pipeline.md](./CI-CD-Pipeline.md) for pipeline configuration
