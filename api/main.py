@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 import uvicorn
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -67,7 +67,7 @@ class ErrorResponse(BaseModel):
 
 
 # Dependency to get configuration
-def get_app_config():
+def get_app_config() -> Any:
     """Get application configuration."""
     try:
         return get_config()
@@ -81,7 +81,7 @@ def get_app_config():
 
 # Global exception handler
 @app.exception_handler(DeltaLakeError)
-async def delta_lake_error_handler(request, exc: DeltaLakeError):
+async def delta_lake_error_handler(request: Request, exc: DeltaLakeError) -> JSONResponse:
     """Handle Delta Lake specific errors."""
     structured_logger.error(
         "Delta Lake error occurred",
@@ -102,7 +102,7 @@ async def delta_lake_error_handler(request, exc: DeltaLakeError):
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request, exc: Exception):
+async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle general exceptions."""
     structured_logger.error(
         "Unexpected error occurred",
@@ -122,7 +122,7 @@ async def general_exception_handler(request, exc: Exception):
 
 # Health check endpoints
 @app.get("/health", response_model=HealthResponse)
-async def health_check(config: Dict[str, Any] = Depends(get_app_config)):
+async def health_check(config: Dict[str, Any] = Depends(get_app_config)) -> HealthResponse:
     """Health check endpoint."""
     return HealthResponse(
         status="healthy",
@@ -133,7 +133,7 @@ async def health_check(config: Dict[str, Any] = Depends(get_app_config)):
 
 
 @app.get("/ready")
-async def readiness_check():
+async def readiness_check() -> Dict[str, str]:
     """Readiness check endpoint."""
     # Add actual readiness checks here (database connectivity, etc.)
     return {"status": "ready"}
@@ -143,7 +143,7 @@ async def readiness_check():
 @app.post("/api/v1/data/query", response_model=DataQueryResponse)
 async def query_data(
     request: DataQueryRequest, config: Dict[str, Any] = Depends(get_app_config)
-):
+) -> DataQueryResponse:
     """
     Execute data query.
 
@@ -183,7 +183,7 @@ async def query_data(
 
 
 @app.get("/api/v1/data/tables")
-async def list_tables(config: Dict[str, Any] = Depends(get_app_config)):
+async def list_tables(config: Dict[str, Any] = Depends(get_app_config)) -> Dict[str, List[Dict[str, Any]]]:
     """List available data tables."""
     # Mock table list
     tables = [
@@ -196,7 +196,7 @@ async def list_tables(config: Dict[str, Any] = Depends(get_app_config)):
 
 
 @app.get("/api/v1/data/tables/{table_name}/schema")
-async def get_table_schema(table_name: str):
+async def get_table_schema(table_name: str) -> Dict[str, Any]:
     """Get table schema."""
     # Mock schema response
     mock_schemas = {
@@ -229,7 +229,7 @@ async def get_table_schema(table_name: str):
 
 # Monitoring endpoints
 @app.get("/api/v1/monitoring/metrics")
-async def get_metrics():
+async def get_metrics() -> Dict[str, Any]:
     """Get system metrics."""
     # Mock metrics
     metrics = {
@@ -244,7 +244,7 @@ async def get_metrics():
 
 
 @app.get("/api/v1/monitoring/health")
-async def get_detailed_health():
+async def get_detailed_health() -> Dict[str, Any]:
     """Get detailed health information."""
     health_info = {
         "status": "healthy",
@@ -261,7 +261,7 @@ async def get_detailed_health():
 
 # ML endpoints
 @app.get("/api/v1/ml/models")
-async def list_models():
+async def list_models() -> Dict[str, List[Dict[str, Any]]]:
     """List available ML models."""
     models = [
         {
@@ -286,7 +286,7 @@ async def list_models():
 
 
 @app.post("/api/v1/ml/models/{model_id}/predict")
-async def predict(model_id: str, data: Dict[str, Any]):
+async def predict(model_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Make prediction using ML model."""
     # Mock prediction response
     predictions = {
@@ -305,7 +305,7 @@ async def predict(model_id: str, data: Dict[str, Any]):
 
 # Startup and shutdown events
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     """Application startup event."""
     structured_logger.info("Delta Lake API starting up")
 
@@ -324,7 +324,7 @@ async def startup_event():
 
 
 @app.on_event("shutdown")
-async def shutdown_event():
+async def shutdown_event() -> None:
     """Application shutdown event."""
     structured_logger.info("Delta Lake API shutting down")
 
