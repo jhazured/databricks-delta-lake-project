@@ -6,7 +6,7 @@ import json
 import logging
 import sys
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 
 
 def setup_logging(
@@ -137,7 +137,7 @@ class JsonFormatter(logging.Formatter):
 
 
 # Performance logging decorator
-def log_performance(logger: logging.Logger):
+def log_performance(logger: logging.Logger) -> Callable[[Callable], Callable]:
     """
     Decorator to log function performance.
 
@@ -145,8 +145,8 @@ def log_performance(logger: logging.Logger):
         logger: Logger instance to use
     """
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Callable) -> Callable:
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             start_time = datetime.utcnow()
             logger.info(f"Starting {func.__name__}")
 

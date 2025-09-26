@@ -29,7 +29,7 @@ class BronzeLayerProcessor:
         self.validator = DataValidator()
         self._setup_validation_rules()
 
-    def _setup_validation_rules(self):
+    def _setup_validation_rules(self) -> None:
         """Set up validation rules for bronze layer data."""
         # Add common validation rules
         self.validator.add_rule("id", validate_not_empty)
@@ -257,7 +257,7 @@ class SampleDataGenerator:
         return data
 
 
-def main():
+def main() -> None:
     """Main function for bronze layer processing."""
     logger = get_logger(__name__)
     logger.info("Starting bronze layer processing")

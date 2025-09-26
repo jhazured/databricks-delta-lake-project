@@ -135,9 +135,15 @@ class ConfigManager:
 
         with open(self.config_path, "r") as f:
             if self.config_path.endswith(".yaml") or self.config_path.endswith(".yml"):
-                return yaml.safe_load(f)
+                data = yaml.safe_load(f)
+                if not isinstance(data, dict):
+                    raise ValueError("YAML configuration must be a dictionary")
+                return data
             elif self.config_path.endswith(".json"):
-                return json.load(f)
+                data = json.load(f)
+                if not isinstance(data, dict):
+                    raise ValueError("JSON configuration must be a dictionary")
+                return data
             else:
                 raise ValueError(
                     f"Unsupported configuration file format: {self.config_path}"

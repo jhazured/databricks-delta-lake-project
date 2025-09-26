@@ -16,7 +16,7 @@ from .exceptions import ValidationError
 class DataValidator:
     """Data validation utility class."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize data validator."""
         self.validation_rules: Dict[str, List[Callable]] = {}
         self.custom_validators: Dict[str, Callable] = {}
@@ -79,7 +79,7 @@ class DataValidator:
 class SchemaValidator:
     """Schema validation utility class."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize schema validator."""
         self.schemas: Dict[str, Dict[str, Any]] = {}
 
@@ -110,12 +110,15 @@ class SchemaValidator:
             raise ValidationError(f"Schema '{schema_name}' not found")
 
         schema = self.schemas[schema_name]
-        result = {"valid": True, "errors": [], "warnings": [], "validated_count": 0}
+        result: Dict[str, Any] = {"valid": True, "errors": [], "warnings": [], "validated_count": 0}
 
+        data_list: List[Dict[str, Any]]
         if isinstance(data, dict):
-            data = [data]
+            data_list = [data]
+        else:
+            data_list = data
 
-        for i, record in enumerate(data):
+        for i, record in enumerate(data_list):
             record_errors = self._validate_record(record, schema)
             if record_errors:
                 result["valid"] = False
@@ -198,7 +201,7 @@ class SchemaValidator:
         }
 
         expected_python_type = type_mapping.get(expected_type)
-        if expected_python_type:
+        if expected_python_type is not None:
             return isinstance(value, expected_python_type)
 
         return False

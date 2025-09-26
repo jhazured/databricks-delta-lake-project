@@ -16,7 +16,16 @@ from .common.exceptions import (
 
 # Common utilities
 from .common.logging import setup_logging
-from .common.validation import validate_data_quality, validate_schema
+from .common.validation import (
+    DataValidator,
+    SchemaValidator,
+    validate_email,
+    validate_phone,
+    validate_date,
+    validate_positive_number,
+    validate_not_empty,
+    validate_json,
+)
 
 # Databricks utilities
 from .databricks.connection import (
@@ -31,8 +40,14 @@ __all__ = [
     # Common utilities
     "setup_logging",
     "load_config",
-    "validate_schema",
-    "validate_data_quality",
+    "DataValidator",
+    "SchemaValidator",
+    "validate_email",
+    "validate_phone",
+    "validate_date",
+    "validate_positive_number",
+    "validate_not_empty",
+    "validate_json",
     "DeltaLakeError",
     "ValidationError",
     "ConfigurationError",
