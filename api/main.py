@@ -156,7 +156,7 @@ async def readiness_check() -> Dict[str, str]:
 # Data endpoints
 @app.post("/api/v1/data/query", response_model=DataQueryResponse)
 async def query_data(
-    request: DataQueryRequest, config: Dict[str, Any] = Depends(get_app_config)
+    request: DataQueryRequest, config: Dict[str, Any] = Depends(get_app_config)  # pylint: disable=unused-argument
 ) -> DataQueryResponse:
     """
     Execute data query.
@@ -335,7 +335,7 @@ async def startup_event() -> None:
             environment=config.environment.value,
             debug=config.debug,
         )
-    except Exception as exc:
+    except Exception as exc:  # pylint: disable=broad-exception-caught
         structured_logger.error(
             "Failed to load configuration during startup", error=str(exc)
         )

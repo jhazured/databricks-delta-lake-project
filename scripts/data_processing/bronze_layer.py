@@ -202,7 +202,7 @@ class SampleDataGenerator:
         """
         import random  # pylint: disable=import-outside-toplevel
         from datetime import (  # pylint: disable=import-outside-toplevel,reimported
-            datetime,
+            datetime as dt,
             timedelta,
         )
 
@@ -212,10 +212,13 @@ class SampleDataGenerator:
                 "id": f"cust_{i:06d}",
                 "name": f"Customer {i}",
                 "email": f"customer{i}@example.com",
-                "phone": f"+1-{random.randint(100, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}",
+                "phone": (
+                    f"+1-{random.randint(100, 999)}-"
+                    f"{random.randint(100, 999)}-{random.randint(1000, 9999)}"
+                ),
                 "address": f"{random.randint(1, 9999)} Main St, City {i % 100}",
                 "registration_date": (
-                    datetime.now() - timedelta(days=random.randint(1, 365))
+                    dt.now() - timedelta(days=random.randint(1, 365))
                 ).strftime("%Y-%m-%d"),
                 "status": random.choice(["active", "inactive", "pending"]),
                 "source": "sample_generator",
@@ -237,7 +240,7 @@ class SampleDataGenerator:
         """
         import random  # pylint: disable=import-outside-toplevel
         from datetime import (  # pylint: disable=import-outside-toplevel,reimported
-            datetime,
+            datetime as dt,
             timedelta,
         )
 
@@ -249,7 +252,7 @@ class SampleDataGenerator:
                 "amount": round(random.uniform(10.0, 1000.0), 2),
                 "currency": random.choice(["USD", "EUR", "GBP"]),
                 "transaction_date": (
-                    datetime.now() - timedelta(days=random.randint(1, 30))
+                    dt.now() - timedelta(days=random.randint(1, 30))
                 ).strftime("%Y-%m-%d %H:%M:%S"),
                 "category": random.choice(
                     ["food", "transport", "entertainment", "shopping", "utilities"]
