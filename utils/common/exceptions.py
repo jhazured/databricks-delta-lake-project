@@ -1,6 +1,4 @@
-"""
-Custom exceptions for the Delta Lake project.
-"""
+"""Custom exceptions for the Delta Lake project."""
 
 from typing import Any, Dict, Optional
 
@@ -14,8 +12,7 @@ class DeltaLakeError(Exception):
         error_code: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
     ):
-        """
-        Initialize Delta Lake error.
+        """Initialize Delta Lake error.
 
         Args:
             message: Error message
@@ -46,8 +43,7 @@ class ValidationError(DeltaLakeError):
         field: Optional[str] = None,
         value: Optional[Any] = None,
     ):
-        """
-        Initialize validation error.
+        """Initialize validation error.
 
         Args:
             message: Error message
@@ -66,8 +62,7 @@ class ConfigurationError(DeltaLakeError):
     """Exception raised for configuration errors."""
 
     def __init__(self, message: str, config_key: Optional[str] = None):
-        """
-        Initialize configuration error.
+        """Initialize configuration error.
 
         Args:
             message: Error message
@@ -87,8 +82,7 @@ class DataProcessingError(DeltaLakeError):
         stage: Optional[str] = None,
         data_source: Optional[str] = None,
     ):
-        """
-        Initialize data processing error.
+        """Initialize data processing error.
 
         Args:
             message: Error message
@@ -110,8 +104,7 @@ class MLModelError(DeltaLakeError):
         model_name: Optional[str] = None,
         model_version: Optional[str] = None,
     ):
-        """
-        Initialize ML model error.
+        """Initialize ML model error.
 
         Args:
             message: Error message
@@ -133,8 +126,7 @@ class APIError(DeltaLakeError):
         status_code: Optional[int] = None,
         endpoint: Optional[str] = None,
     ):
-        """
-        Initialize API error.
+        """Initialize API error.
 
         Args:
             message: Error message
@@ -156,8 +148,7 @@ class SecurityError(DeltaLakeError):
         security_event: Optional[str] = None,
         user: Optional[str] = None,
     ):
-        """
-        Initialize security error.
+        """Initialize security error.
 
         Args:
             message: Error message
@@ -179,8 +170,7 @@ class InfrastructureError(DeltaLakeError):
         resource_type: Optional[str] = None,
         resource_name: Optional[str] = None,
     ):
-        """
-        Initialize infrastructure error.
+        """Initialize infrastructure error.
 
         Args:
             message: Error message
@@ -204,8 +194,7 @@ class MonitoringError(DeltaLakeError):
         metric_name: Optional[str] = None,
         alert_type: Optional[str] = None,
     ):
-        """
-        Initialize monitoring error.
+        """Initialize monitoring error.
 
         Args:
             message: Error message

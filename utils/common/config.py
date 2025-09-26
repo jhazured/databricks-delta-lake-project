@@ -1,6 +1,4 @@
-"""
-Configuration management utilities.
-"""
+"""Configuration management utilities."""
 
 import json
 import os
@@ -93,8 +91,7 @@ class ConfigManager:
     """Configuration manager for the application."""
 
     def __init__(self, config_path: Optional[str] = None):
-        """
-        Initialize configuration manager.
+        """Initialize configuration manager.
 
         Args:
             config_path: Path to configuration file
@@ -108,8 +105,7 @@ class ConfigManager:
         return f"config/environments/{env}.yaml"
 
     def load_config(self) -> AppConfig:
-        """
-        Load configuration from file and environment variables.
+        """Load configuration from file and environment variables.
 
         Returns:
             Application configuration
@@ -244,8 +240,7 @@ class ConfigManager:
         )
 
     def save_config(self, config: AppConfig, path: Optional[str] = None) -> None:
-        """
-        Save configuration to file.
+        """Save configuration to file.
 
         Args:
             config: Configuration to save
@@ -263,8 +258,7 @@ class ConfigManager:
 
 
 def load_config(config_path: Optional[str] = None) -> AppConfig:
-    """
-    Load configuration using ConfigManager.
+    """Load configuration using ConfigManager.
 
     Args:
         config_path: Optional path to configuration file
@@ -281,8 +275,7 @@ _config_instance: Optional[AppConfig] = None
 
 
 def get_config() -> AppConfig:
-    """
-    Get global configuration instance.
+    """Get global configuration instance.
 
     Returns:
         Application configuration
@@ -294,8 +287,7 @@ def get_config() -> AppConfig:
 
 
 def reload_config() -> AppConfig:
-    """
-    Reload configuration from file.
+    """Reload configuration from file.
 
     Returns:
         Reloaded application configuration

@@ -157,8 +157,7 @@ async def query_data(
     request: DataQueryRequest,
     config: Dict[str, Any] = Depends(get_app_config),  # pylint: disable=unused-argument
 ) -> DataQueryResponse:
-    """
-    Execute data query.
+    """Execute data query.
 
     Note: This is a mock implementation for testing.
     In production, this would connect to Databricks.

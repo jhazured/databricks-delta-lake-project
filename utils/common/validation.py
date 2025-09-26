@@ -1,6 +1,4 @@
-"""
-Data validation utilities.
-"""
+"""Data validation utilities."""
 
 import json
 import re
@@ -22,8 +20,7 @@ class DataValidator:
         self.custom_validators: Dict[str, Callable] = {}
 
     def add_rule(self, field_name: str, validator: Callable) -> None:
-        """
-        Add validation rule for a field.
+        """Add validation rule for a field.
 
         Args:
             field_name: Name of the field to validate
@@ -34,8 +31,7 @@ class DataValidator:
         self.validation_rules[field_name].append(validator)
 
     def validate(self, data: Dict[str, Any]) -> Dict[str, List[str]]:
-        """
-        Validate data against all rules.
+        """Validate data against all rules.
 
         Args:
             data: Data to validate
@@ -63,8 +59,7 @@ class DataValidator:
         return errors
 
     def is_valid(self, data: Dict[str, Any]) -> bool:
-        """
-        Check if data is valid.
+        """Check if data is valid.
 
         Args:
             data: Data to validate
@@ -84,8 +79,7 @@ class SchemaValidator:
         self.schemas: Dict[str, Dict[str, Any]] = {}
 
     def add_schema(self, name: str, schema: Dict[str, Any]) -> None:
-        """
-        Add schema definition.
+        """Add schema definition.
 
         Args:
             name: Schema name
@@ -96,8 +90,7 @@ class SchemaValidator:
     def validate_data(
         self, data: Union[Dict, List[Dict]], schema_name: str
     ) -> Dict[str, Any]:
-        """
-        Validate data against schema.
+        """Validate data against schema.
 
         Args:
             data: Data to validate

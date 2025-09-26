@@ -16,8 +16,7 @@ class BronzeLayerProcessor:
     """Bronze layer data processor."""
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """
-        Initialize bronze layer processor.
+        """Initialize bronze layer processor.
 
         Args:
             config: Optional configuration dictionary
@@ -36,8 +35,7 @@ class BronzeLayerProcessor:
 
     @log_performance(get_logger(__name__))
     def process_raw_data(self, data: List[Dict[str, Any]], source: str) -> pd.DataFrame:
-        """
-        Process raw data into bronze layer format.
+        """Process raw data into bronze layer format.
 
         Args:
             data: Raw data to process
@@ -81,8 +79,7 @@ class BronzeLayerProcessor:
             ) from exc
 
     def _add_bronze_metadata(self, df: pd.DataFrame, source: str) -> pd.DataFrame:
-        """
-        Add bronze layer metadata to DataFrame.
+        """Add bronze layer metadata to DataFrame.
 
         Args:
             df: Input DataFrame
@@ -104,8 +101,7 @@ class BronzeLayerProcessor:
         return f"batch_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
 
     def _calculate_quality_metrics(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """
-        Calculate data quality metrics.
+        """Calculate data quality metrics.
 
         Args:
             df: DataFrame to analyze
@@ -133,8 +129,7 @@ class BronzeLayerProcessor:
     def save_bronze_data(
         self, df: pd.DataFrame, table_name: str, output_path: str
     ) -> str:
-        """
-        Save bronze layer data to storage.
+        """Save bronze layer data to storage.
 
         Args:
             df: DataFrame to save
@@ -163,8 +158,7 @@ class BronzeLayerProcessor:
             ) from exc
 
     def load_bronze_data(self, file_path: str) -> pd.DataFrame:
-        """
-        Load bronze layer data from storage.
+        """Load bronze layer data from storage.
 
         Args:
             file_path: Path to the bronze data file

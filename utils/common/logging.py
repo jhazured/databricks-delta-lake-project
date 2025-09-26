@@ -1,6 +1,4 @@
-"""
-Logging utilities for the Delta Lake project.
-"""
+"""Logging utilities for the Delta Lake project."""
 
 import json
 import logging
@@ -15,8 +13,7 @@ def setup_logging(
     log_file: Optional[str] = None,
     structured: bool = True,
 ) -> None:
-    """
-    Set up logging configuration for the application.
+    """Set up logging configuration for the application.
 
     Args:
         level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
@@ -58,8 +55,7 @@ def setup_logging(
 
 
 def get_logger(name: str) -> logging.Logger:
-    """
-    Get a logger instance for the given name.
+    """Get a logger instance for the given name.
 
     Args:
         name: Logger name (usually __name__)
@@ -71,9 +67,7 @@ def get_logger(name: str) -> logging.Logger:
 
 
 class StructuredLogger:
-    """
-    Structured logger for JSON-formatted logs.
-    """
+    """Structured logger for JSON-formatted logs."""
 
     def __init__(self, name: str):
         self.logger = logging.getLogger(name)
@@ -113,9 +107,7 @@ class StructuredLogger:
 
 
 class JsonFormatter(logging.Formatter):
-    """
-    JSON formatter for structured logging.
-    """
+    """JSON formatter for structured logging."""
 
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON."""
@@ -138,8 +130,7 @@ class JsonFormatter(logging.Formatter):
 
 # Performance logging decorator
 def log_performance(logger: logging.Logger) -> Callable[[Callable], Callable]:
-    """
-    Decorator to log function performance.
+    """Decorator to log function performance.
 
     Args:
         logger: Logger instance to use

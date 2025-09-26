@@ -1,6 +1,4 @@
-"""
-Databricks connection management.
-"""
+"""Databricks connection management."""
 
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
@@ -27,8 +25,7 @@ class DatabricksConnection:
     """Databricks connection manager."""
 
     def __init__(self, config: DatabricksConfig):
-        """
-        Initialize Databricks connection.
+        """Initialize Databricks connection.
 
         Args:
             config: Databricks configuration
@@ -44,8 +41,7 @@ class DatabricksConnection:
         )
 
     def test_connection(self) -> bool:
-        """
-        Test connection to Databricks workspace.
+        """Test connection to Databricks workspace.
 
         Returns:
             True if connection is successful
@@ -60,8 +56,7 @@ class DatabricksConnection:
             return False
 
     def get_clusters(self) -> List[Dict[str, Any]]:
-        """
-        Get list of clusters.
+        """Get list of clusters.
 
         Returns:
             List of cluster information
@@ -80,8 +75,7 @@ class DatabricksConnection:
             )
 
     def get_cluster_info(self, cluster_id: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Get cluster information.
+        """Get cluster information.
 
         Args:
             cluster_id: Cluster ID (uses config cluster_id if not provided)
@@ -110,8 +104,7 @@ class DatabricksConnection:
             )
 
     def start_cluster(self, cluster_id: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Start a cluster.
+        """Start a cluster.
 
         Args:
             cluster_id: Cluster ID (uses config cluster_id if not provided)
@@ -140,8 +133,7 @@ class DatabricksConnection:
             )
 
     def stop_cluster(self, cluster_id: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Stop a cluster.
+        """Stop a cluster.
 
         Args:
             cluster_id: Cluster ID (uses config cluster_id if not provided)
@@ -170,8 +162,7 @@ class DatabricksConnection:
             )
 
     def restart_cluster(self, cluster_id: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Restart a cluster.
+        """Restart a cluster.
 
         Args:
             cluster_id: Cluster ID (uses config cluster_id if not provided)
@@ -203,8 +194,7 @@ class DatabricksConnection:
     def execute_sql(
         self, sql: str, warehouse_id: Optional[str] = None
     ) -> Dict[str, Any]:
-        """
-        Execute SQL query.
+        """Execute SQL query.
 
         Args:
             sql: SQL query to execute
@@ -230,8 +220,7 @@ class DatabricksConnection:
             )
 
     def get_jobs(self) -> List[Dict[str, Any]]:
-        """
-        Get list of jobs.
+        """Get list of jobs.
 
         Returns:
             List of job information
@@ -252,8 +241,7 @@ class DatabricksConnection:
     def run_job(
         self, job_id: int, parameters: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """
-        Run a job.
+        """Run a job.
 
         Args:
             job_id: Job ID to run
@@ -282,8 +270,7 @@ class DatabricksConnection:
             )
 
     def get_job_run(self, run_id: int) -> Dict[str, Any]:
-        """
-        Get job run information.
+        """Get job run information.
 
         Args:
             run_id: Job run ID
@@ -306,8 +293,7 @@ class DatabricksConnection:
             )
 
     def upload_file(self, file_path: str, target_path: str) -> Dict[str, Any]:
-        """
-        Upload file to Databricks workspace.
+        """Upload file to Databricks workspace.
 
         Args:
             file_path: Local file path
@@ -336,8 +322,7 @@ class DatabricksConnection:
             )
 
     def list_workspace(self, path: str = "/") -> List[Dict[str, Any]]:
-        """
-        List workspace contents.
+        """List workspace contents.
 
         Args:
             path: Workspace path to list
@@ -369,8 +354,7 @@ _connection_instance: Optional[DatabricksConnection] = None
 def get_databricks_connection(
     config: Optional[DatabricksConfig] = None,
 ) -> DatabricksConnection:
-    """
-    Get global Databricks connection instance.
+    """Get global Databricks connection instance.
 
     Args:
         config: Optional Databricks configuration
