@@ -325,7 +325,15 @@ def validate_phone(value: Any) -> None:
     if value is None:
         return
 
-    phone_pattern = r"^\+?[\d\s\-\(\)]{10,}$"
+    # Remove all non-digit characters for validation
+    digits_only = re.sub(r"[^\d]", "", str(value))
+
+    # Check if we have at least 10 digits
+    if len(digits_only) < 10:
+        raise ValidationError("Invalid phone number format", value=value)
+
+    # Check if the original string contains only valid phone characters
+    phone_pattern = r"^\+?[\d\s\-\(\)\.]+$"
     if not re.match(phone_pattern, str(value)):
         raise ValidationError("Invalid phone number format", value=value)
 

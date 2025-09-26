@@ -5,7 +5,7 @@ Logging utilities for the Delta Lake project.
 import json
 import logging
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable, Dict, Optional
 
 
@@ -104,7 +104,7 @@ class StructuredLogger:
     def _log(self, level: int, message: str, **kwargs: Any) -> None:
         """Internal logging method."""
         log_data = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "level": logging.getLevelName(level),
             "message": message,
             **kwargs,

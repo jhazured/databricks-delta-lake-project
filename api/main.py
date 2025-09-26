@@ -40,6 +40,8 @@ app.add_middleware(
 
 # Pydantic models
 class HealthResponse(BaseModel):
+    """Health check response model."""
+
     status: str
     timestamp: datetime
     version: str
@@ -47,12 +49,16 @@ class HealthResponse(BaseModel):
 
 
 class DataQueryRequest(BaseModel):
+    """Data query request model."""
+
     query: str
     limit: Optional[int] = 100
     parameters: Optional[Dict[str, Any]] = None
 
 
 class DataQueryResponse(BaseModel):
+    """Data query response model."""
+
     data: List[Dict[str, Any]]
     total_rows: int
     execution_time_ms: float
@@ -60,6 +66,8 @@ class DataQueryResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
+    """Error response model."""
+
     error: str
     message: str
     timestamp: datetime
@@ -71,17 +79,19 @@ def get_app_config() -> Any:
     """Get application configuration."""
     try:
         return get_config()
-    except Exception as e:
-        logger.error(f"Failed to load configuration: {str(e)}")
+    except Exception as exc:
+        logger.error("Failed to load configuration: %s", str(exc))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Configuration error",
-        )
+        ) from exc
 
 
 # Global exception handler
 @app.exception_handler(DeltaLakeError)
-async def delta_lake_error_handler(request: Request, exc: DeltaLakeError) -> JSONResponse:
+async def delta_lake_error_handler(
+    request: Request, exc: DeltaLakeError  # pylint: disable=unused-argument
+) -> JSONResponse:
     """Handle Delta Lake specific errors."""
     structured_logger.error(
         "Delta Lake error occurred",
@@ -102,7 +112,9 @@ async def delta_lake_error_handler(request: Request, exc: DeltaLakeError) -> JSO
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+async def general_exception_handler(
+    request: Request, exc: Exception  # pylint: disable=unused-argument
+) -> JSONResponse:
     """Handle general exceptions."""
     structured_logger.error(
         "Unexpected error occurred",
@@ -122,7 +134,9 @@ async def general_exception_handler(request: Request, exc: Exception) -> JSONRes
 
 # Health check endpoints
 @app.get("/health", response_model=HealthResponse)
-async def health_check(config: Dict[str, Any] = Depends(get_app_config)) -> HealthResponse:
+async def health_check(
+    config: Dict[str, Any] = Depends(get_app_config),  # pylint: disable=unused-argument
+) -> HealthResponse:
     """Health check endpoint."""
     return HealthResponse(
         status="healthy",
@@ -163,7 +177,7 @@ async def query_data(
         ]
 
         # Simulate query execution time
-        import time
+        import time  # pylint: disable=import-outside-toplevel
 
         start_time = time.time()
         time.sleep(0.1)  # Simulate processing time
@@ -176,14 +190,16 @@ async def query_data(
             query=request.query,
         )
 
-    except Exception as e:
+    except Exception as exc:
         raise APIError(
-            f"Failed to execute query: {str(e)}", endpoint="/api/v1/data/query"
-        )
+            f"Failed to execute query: {str(exc)}", endpoint="/api/v1/data/query"
+        ) from exc
 
 
 @app.get("/api/v1/data/tables")
-async def list_tables(config: Dict[str, Any] = Depends(get_app_config)) -> Dict[str, List[Dict[str, Any]]]:
+async def list_tables(
+    config: Dict[str, Any] = Depends(get_app_config),  # pylint: disable=unused-argument
+) -> Dict[str, List[Dict[str, Any]]]:
     """List available data tables."""
     # Mock table list
     tables = [
@@ -286,7 +302,9 @@ async def list_models() -> Dict[str, List[Dict[str, Any]]]:
 
 
 @app.post("/api/v1/ml/models/{model_id}/predict")
-async def predict(model_id: str, data: Dict[str, Any]) -> Dict[str, Any]:
+async def predict(
+    model_id: str, data: Dict[str, Any]  # pylint: disable=unused-argument
+) -> Dict[str, Any]:
     """Make prediction using ML model."""
     # Mock prediction response
     predictions = {
@@ -317,9 +335,9 @@ async def startup_event() -> None:
             environment=config.environment.value,
             debug=config.debug,
         )
-    except Exception as e:
+    except Exception as exc:
         structured_logger.error(
-            "Failed to load configuration during startup", error=str(e)
+            "Failed to load configuration during startup", error=str(exc)
         )
 
 

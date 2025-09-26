@@ -2,7 +2,6 @@
 Bronze layer data processing pipeline.
 """
 
-import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -49,7 +48,7 @@ class BronzeLayerProcessor:
             Processed DataFrame
         """
         try:
-            self.logger.info(f"Processing {len(data)} records from source: {source}")
+            self.logger.info("Processing %d records from source: %s", len(data), source)
 
             # Validate data
             validation_errors = []
@@ -61,7 +60,7 @@ class BronzeLayerProcessor:
                     )
 
             if validation_errors:
-                self.logger.warning(f"Validation errors found: {validation_errors}")
+                self.logger.warning("Validation errors found: %s", validation_errors)
 
             # Convert to DataFrame
             df = pd.DataFrame(data)
@@ -71,16 +70,16 @@ class BronzeLayerProcessor:
 
             # Data quality checks
             quality_metrics = self._calculate_quality_metrics(df)
-            self.logger.info(f"Data quality metrics: {quality_metrics}")
+            self.logger.info("Data quality metrics: %s", quality_metrics)
 
             return df
 
-        except Exception as e:
+        except Exception as exc:
             raise DataProcessingError(
-                f"Failed to process raw data from {source}: {str(e)}",
+                f"Failed to process raw data from {source}: {str(exc)}",
                 stage="bronze_layer",
                 data_source=source,
-            )
+            ) from exc
 
     def _add_bronze_metadata(self, df: pd.DataFrame, source: str) -> pd.DataFrame:
         """
@@ -154,15 +153,15 @@ class BronzeLayerProcessor:
             file_path = output_dir / f"{table_name}_bronze.parquet"
             df.to_parquet(file_path, index=False)
 
-            self.logger.info(f"Saved bronze data to: {file_path}")
+            self.logger.info("Saved bronze data to: %s", file_path)
             return str(file_path)
 
-        except Exception as e:
+        except Exception as exc:
             raise DataProcessingError(
-                f"Failed to save bronze data: {str(e)}",
+                f"Failed to save bronze data: {str(exc)}",
                 stage="bronze_save",
                 data_source=table_name,
-            )
+            ) from exc
 
     def load_bronze_data(self, file_path: str) -> pd.DataFrame:
         """
@@ -176,15 +175,15 @@ class BronzeLayerProcessor:
         """
         try:
             df = pd.read_parquet(file_path)
-            self.logger.info(f"Loaded bronze data from: {file_path}")
+            self.logger.info("Loaded bronze data from: %s", file_path)
             return df
 
-        except Exception as e:
+        except Exception as exc:
             raise DataProcessingError(
-                f"Failed to load bronze data: {str(e)}",
+                f"Failed to load bronze data: {str(exc)}",
                 stage="bronze_load",
                 data_source=file_path,
-            )
+            ) from exc
 
 
 class SampleDataGenerator:
@@ -201,8 +200,11 @@ class SampleDataGenerator:
         Returns:
             List of customer records
         """
-        import random
-        from datetime import datetime, timedelta
+        import random  # pylint: disable=import-outside-toplevel
+        from datetime import (
+            datetime,
+            timedelta,
+        )  # pylint: disable=import-outside-toplevel,reimported
 
         data = []
         for i in range(count):
@@ -233,8 +235,11 @@ class SampleDataGenerator:
         Returns:
             List of transaction records
         """
-        import random
-        from datetime import datetime, timedelta
+        import random  # pylint: disable=import-outside-toplevel
+        from datetime import (
+            datetime,
+            timedelta,
+        )  # pylint: disable=import-outside-toplevel,reimported
 
         data = []
         for i in range(count):
@@ -288,9 +293,9 @@ def main() -> None:
         transaction_df, "transactions", "data/bronze/transactions"
     )
 
-    logger.info(f"Bronze layer processing completed. Files saved to:")
-    logger.info(f"  - Customers: {customer_path}")
-    logger.info(f"  - Transactions: {transaction_path}")
+    logger.info("Bronze layer processing completed. Files saved to:")
+    logger.info("  - Customers: %s", customer_path)
+    logger.info("  - Transactions: %s", transaction_path)
 
 
 if __name__ == "__main__":
