@@ -64,6 +64,22 @@ jobs:
     - name: Type checking with mypy
       run: |
         mypy utils/ scripts/ api/ --ignore-missing-imports
+    
+    - name: Code analysis with pylint
+      run: |
+        pylint utils/ scripts/ api/ --disable=C0114,C0116 --score=y --fail-under=8.0
+    
+    - name: Documentation style with pydocstyle
+      run: |
+        pydocstyle utils/ scripts/ api/ --count
+    
+    - name: Dead code detection with vulture
+      run: |
+        vulture utils/ scripts/ api/ --min-confidence 70 --exclude api/main.py
+    
+    - name: Code complexity with radon
+      run: |
+        radon cc utils/ scripts/ api/ --min B --show-complexity
 
   # Matrix testing across Python versions
   test:

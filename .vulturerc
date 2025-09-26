@@ -1,0 +1,33 @@
+[vulture]
+# Minimum confidence level for reporting dead code
+min-confidence = 70
+
+# Paths to ignore
+ignore-decorators = @app.get,@app.post,@app.put,@app.delete,@app.patch,@app.exception_handler,@app.on_event
+
+# Files to ignore
+ignore-names = 
+
+# Paths to ignore
+ignore-paths = 
+
+# Exclude patterns
+exclude = api/main.py,*/test_*.py,*/__init__.py
+
+# Sort by size
+sort-by-size = True
+
+# Make whitelist
+make-whitelist = False
+
+# Whitelist file
+whitelist = 
+
+# Paths to scan
+paths = utils/,scripts/,api/
+
+# Verbose output
+verbose = False
+
+# Debug mode
+debug = False
