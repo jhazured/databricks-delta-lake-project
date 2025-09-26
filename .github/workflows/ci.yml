@@ -8,15 +8,67 @@ on:
   schedule:
     # Run security checks daily at 2 AM UTC
     - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - staging
+        - prod
+        - trial
 
 env:
   PYTHON_VERSION: '3.11'
   JAVA_VERSION: '11'
 
 jobs:
+  # Code Quality and Linting
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/pyproject.toml') }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Lint with flake8
+      run: |
+        flake8 utils/ scripts/ api/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 utils/ scripts/ api/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+    
+    - name: Check code formatting with black
+      run: |
+        black --check utils/ scripts/ api/
+    
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only utils/ scripts/ api/
+    
+    - name: Type checking with mypy
+      run: |
+        mypy utils/ scripts/ api/ --ignore-missing-imports
+
   # Matrix testing across Python versions
   test:
     runs-on: ubuntu-latest
+    needs: [code-quality]
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
@@ -104,10 +156,10 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
     
-    - name: Install dependencies
+    - name: Install security tools
       run: |
         python -m pip install --upgrade pip
-        pip install safety bandit
+        pip install safety bandit semgrep
     
     - name: Run safety check
       run: |
@@ -115,15 +167,117 @@ jobs:
     
     - name: Run bandit security linter
       run: |
-        bandit -r scripts/ utils/ -f json -o bandit-report.json || true
+        bandit -r scripts/ utils/ api/ -f json -o bandit-report.json || true
+    
+    - name: Run Semgrep security scan
+      run: |
+        semgrep --config=auto --json --output=semgrep-report.json utils/ scripts/ api/ || true
     
     - name: Upload security reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
           safety-report.json
           bandit-report.json
+          semgrep-report.json
+
+  # Docker Build and Test
+  docker-tests:
+    runs-on: ubuntu-latest
+    needs: [code-quality]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build development image
+      run: |
+        docker build --target development -t delta-lake-dev:latest .
+    
+    - name: Build production image
+      run: |
+        docker build --target production -t delta-lake-prod:latest .
+    
+    - name: Build API image
+      run: |
+        docker build --target api -t delta-lake-api:latest .
+    
+    - name: Build data processing image
+      run: |
+        docker build --target data-processing -t delta-lake-processor:latest .
+    
+    - name: Test development image
+      run: |
+        docker run --rm delta-lake-dev:latest python -c "import utils.common; print('Import successful')"
+    
+    - name: Test production image
+      run: |
+        docker run --rm delta-lake-prod:latest python -c "import utils.common; print('Import successful')"
+
+  # Kubernetes Manifest Validation
+  kubernetes-validation:
+    runs-on: ubuntu-latest
+    needs: [docker-tests]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: Validate Kubernetes manifests
+      run: |
+        # Validate YAML syntax
+        for file in infrastructure/kubernetes/*.yaml; do
+          echo "Validating $file"
+          kubectl --dry-run=client apply -f "$file"
+        done
+    
+    - name: Check Kubernetes best practices
+      run: |
+        # Check for common issues
+        echo "Checking for hardcoded secrets..."
+        grep -r "password\|secret\|token" infrastructure/kubernetes/ || echo "No hardcoded secrets found"
+        
+        echo "Checking for resource limits..."
+        grep -r "resources:" infrastructure/kubernetes/ || echo "No resource limits found"
+
+  # Terraform Validation
+  terraform-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: '1.5.0'
+    
+    - name: Terraform Format Check
+      run: |
+        cd infrastructure/terraform
+        terraform fmt -check -recursive
+    
+    - name: Terraform Init
+      run: |
+        cd infrastructure/terraform
+        terraform init -backend=false
+    
+    - name: Terraform Validate
+      run: |
+        cd infrastructure/terraform
+        terraform validate
+    
+    - name: Terraform Plan (Dry Run)
+      run: |
+        cd infrastructure/terraform
+        terraform plan -var="databricks_host=test-host" -var="databricks_token=test-token" -var="environment=test"
 
   # Performance testing
   performance:
@@ -158,7 +312,7 @@ jobs:
   # Build and package
   build:
     runs-on: ubuntu-latest
-    needs: [test, security]
+    needs: [test, security, docker-tests, kubernetes-validation, terraform-validation]
     
     steps:
     - uses: actions/checkout@v4
@@ -182,23 +336,25 @@ jobs:
         twine check dist/*
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: python-package-distributions
         path: dist/
 
-  # Deploy to Databricks (only on main branch)
+  # Deploy to Databricks (conditional based on trigger)
   deploy:
     runs-on: ubuntu-latest
     needs: [build, performance]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment: production
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch')
+    environment: ${{ github.event.inputs.environment || 'production' }}
     
     steps:
     - uses: actions/checkout@v4
     
     - name: Download build artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: python-package-distributions
         path: dist/
@@ -231,3 +387,70 @@ jobs:
       env:
         DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+
+  # Test Results Summary
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [code-quality, test, security, docker-tests, kubernetes-validation, terraform-validation, build]
+    if: always()
+    
+    steps:
+    - name: Test Results Summary
+      run: |
+        echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        echo "### ✅ Passed Jobs:" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.code-quality.result }}" == "success" ]; then
+          echo "- ✅ Code Quality" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.test.result }}" == "success" ]; then
+          echo "- ✅ Unit Tests (Matrix)" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.security.result }}" == "success" ]; then
+          echo "- ✅ Security Scan" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.docker-tests.result }}" == "success" ]; then
+          echo "- ✅ Docker Tests" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.kubernetes-validation.result }}" == "success" ]; then
+          echo "- ✅ Kubernetes Validation" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.terraform-validation.result }}" == "success" ]; then
+          echo "- ✅ Terraform Validation" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.build.result }}" == "success" ]; then
+          echo "- ✅ Build Package" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### ❌ Failed Jobs:" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.code-quality.result }}" == "failure" ]; then
+          echo "- ❌ Code Quality" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.test.result }}" == "failure" ]; then
+          echo "- ❌ Unit Tests (Matrix)" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.security.result }}" == "failure" ]; then
+          echo "- ❌ Security Scan" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.docker-tests.result }}" == "failure" ]; then
+          echo "- ❌ Docker Tests" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.kubernetes-validation.result }}" == "failure" ]; then
+          echo "- ❌ Kubernetes Validation" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.terraform-validation.result }}" == "failure" ]; then
+          echo "- ❌ Terraform Validation" >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ "${{ needs.build.result }}" == "failure" ]; then
+          echo "- ❌ Build Package" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Overall Status:" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.build.result }}" == "success" ]; then
+          echo "🎉 **All tests passed!** Ready for deployment." >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Some tests failed.** Please review the logs above." >> $GITHUB_STEP_SUMMARY
+        fi
