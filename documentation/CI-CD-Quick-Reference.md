@@ -1,232 +1,164 @@
-# CI/CD Quick Reference Guide
+# CI/CD Quick Reference
 
-## 🚀 Quick Start
+## 🚀 Workflow Overview
 
-### What Happens When You Push Code
+**Single File**: `.github/workflows/ci.yml`  
+**Trigger**: Push, PR, Schedule, Manual  
+**Jobs**: 10 comprehensive jobs covering all aspects
 
-1. **Push to `main`** → Full pipeline (test, build, deploy)
-2. **Push to `develop`** → Test and build only
-3. **Pull Request** → Test and build only
-4. **Daily at 2 AM** → Security scan only
+## 📋 Job Summary
 
-## 📋 Required Setup
+| Job | Purpose | Dependencies | Runs On |
+|-----|---------|--------------|---------|
+| `code-quality` | Linting, formatting, type checking | None | All triggers |
+| `test` | Unit tests (Python 3.9-3.11, Java 11-17) | code-quality | All triggers |
+| `security` | Vulnerability scanning | None | All triggers |
+| `docker-tests` | Container build & test | code-quality | All triggers |
+| `kubernetes-validation` | K8s manifest validation | docker-tests | All triggers |
+| `terraform-validation` | Infrastructure validation | None | All triggers |
+| `performance` | Benchmark testing | None | Push to main only |
+| `build` | Package creation | All test jobs | All triggers |
+| `deploy` | Databricks deployment | build, performance | Push to main OR manual |
+| `test-summary` | Results overview | All jobs | Always |
 
-### GitHub Secrets (for deployment)
-```
-DATABRICKS_TOKEN     # Your Databricks personal access token
-DATABRICKS_HOST      # Your Databricks workspace URL  
-DATABRICKS_CLUSTER_ID # Target cluster ID
-```
+## ⚡ Quick Commands
 
-**Setup**: Repository Settings → Secrets and variables → Actions
-
-## 🧪 Writing Tests
-
-### Test Structure
-```
-testing/
-├── unit/           # Fast, isolated tests
-├── integration/    # Database/external service tests  
-├── performance/    # Benchmark tests
-├── security/       # Security-focused tests
-└── e2e/           # End-to-end tests
-```
-
-### Test Markers
-```python
-@pytest.mark.unit
-def test_basic_function():
-    pass
-
-@pytest.mark.integration  
-def test_database_connection():
-    pass
-
-@pytest.mark.slow
-def test_large_dataset():
-    pass
-
-@pytest.mark.performance
-def test_benchmark():
-    pass
-```
-
-### Test Naming
-- Files: `test_*.py` or `*_test.py`
-- Functions: `test_*`
-- Classes: `Test*`
-
-## 🔍 Code Quality Standards
-
-### Linting (flake8)
-- Max line length: 88 characters
-- Max complexity: 10
-- Critical errors: E9, F63, F7, F82
-
-### Formatting (black)
+### Local Development
 ```bash
-black scripts/ utils/  # Format code
-black --check scripts/ utils/  # Check formatting
+# Format code
+black utils/ scripts/ api/
+isort utils/ scripts/ api/
+
+# Run linting
+flake8 utils/ scripts/ api/ --max-line-length=88
+
+# Run tests
+pytest testing/unit/ -v
+
+# Type checking
+mypy utils/ scripts/ api/ --ignore-missing-imports
 ```
-
-### Import Sorting (isort)
-```bash
-isort scripts/ utils/  # Sort imports
-isort --check-only scripts/ utils/  # Check sorting
-```
-
-### Type Checking (mypy)
-```bash
-mypy scripts/ utils/ --ignore-missing-imports
-```
-
-## 🛡️ Security
-
-### Daily Security Scans
-- **Safety**: Dependency vulnerability check
-- **Bandit**: Code security analysis
-- **Reports**: Available in Actions artifacts
-
-### Manual Security Check
-```bash
-pip install safety bandit
-safety check
-bandit -r scripts/ utils/
-```
-
-## 📊 Performance Testing
-
-### Benchmark Tests
-```python
-import pytest
-
-@pytest.mark.performance
-def test_processing_speed(benchmark):
-    result = benchmark(process_data, large_dataset)
-    assert result is not None
-```
-
-### Performance Baselines
-- Stored in `testing/performance/`
-- Compared against previous runs
-- Alerts on significant regressions
-
-## 🏗️ Building
-
-### Local Build
-```bash
-pip install build
-python -m build
-```
-
-### Package Validation
-```bash
-pip install twine
-twine check dist/*
-```
-
-## 🚀 Deployment
-
-### Automatic Deployment
-- Triggers on `main` branch pushes
-- Requires all tests to pass
-- Uses production environment protection
 
 ### Manual Deployment
+1. Go to GitHub Actions tab
+2. Select "Databricks Delta Lake CI/CD Pipeline"
+3. Click "Run workflow"
+4. Choose environment: `dev`, `staging`, `prod`, `trial`
+5. Click "Run workflow"
+
+## 🔧 Environment Variables
+
+```yaml
+PYTHON_VERSION: '3.11'    # Default Python version
+JAVA_VERSION: '11'        # Default Java version
+```
+
+## 🔐 Required Secrets
+
+```
+DATABRICKS_HOST          # Databricks workspace URL
+DATABRICKS_TOKEN         # Personal access token
+DATABRICKS_CLUSTER_ID    # Target cluster ID
+DATABRICKS_DEPLOYMENT_JOB_ID  # Deployment job ID
+```
+
+## 📊 Test Matrix
+
+| Python | Java | Status |
+|--------|------|--------|
+| 3.9    | 11   | ✅     |
+| 3.10   | 11   | ✅     |
+| 3.11   | 11   | ✅     |
+| 3.11   | 17   | ✅     |
+
+## 🐳 Docker Targets
+
+- `development`: Dev environment with all tools
+- `production`: Optimized production image
+- `api`: FastAPI service container
+- `data-processing`: Data pipeline container
+
+## 🚨 Common Issues & Fixes
+
+### Code Quality Failures
 ```bash
-pip install databricks-cli
-databricks configure --token
-databricks fs cp dist/*.whl dbfs:/FileStore/jars/
+# Fix formatting
+black utils/ scripts/ api/
+isort utils/ scripts/ api/
+
+# Fix linting
+flake8 utils/ scripts/ api/ --max-line-length=88
+```
+
+### Test Failures
+- Check test logs for specific errors
+- Verify test data and mocks
+- Update tests for API changes
+
+### Security Issues
+- Review vulnerability reports
+- Update dependencies if needed
+- Address security findings
+
+### Terraform Errors
+```bash
+# Fix formatting
+terraform fmt -recursive infrastructure/terraform/
+
+# Validate syntax
+terraform validate infrastructure/terraform/
 ```
 
 ## 📈 Monitoring
 
-### View Results
-1. Go to repository → **Actions** tab
-2. Click on workflow run
-3. Check individual job logs
-4. Download artifacts
-
 ### Key Metrics
-- **Test Coverage**: Uploaded to Codecov
-- **Build Time**: Visible in Actions interface
-- **Security Reports**: Available as artifacts
-- **Performance Baselines**: Stored in artifacts
+- Workflow execution time
+- Test pass/fail rates
+- Security vulnerability trends
+- Deployment success rates
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Tests Not Running
-- Check file naming: `test_*.py`
-- Verify test directory structure
-- Check pytest configuration
-
-#### Security Scan Failures
-- Update vulnerable dependencies
-- Fix Bandit security issues
-- Review security reports
-
-#### Build Failures
-- Check `pyproject.toml` syntax
-- Verify all dependencies listed
-- Review build logs
-
-#### Deployment Failures
-- Verify GitHub secrets are set
-- Check Databricks connectivity
-- Ensure cluster is running
-
-### Debug Commands
-```bash
-# Run tests locally
-pytest testing/unit/ -v
-
-# Check code quality
-flake8 scripts/ utils/
-black --check scripts/ utils/
-isort --check-only scripts/ utils/
-mypy scripts/ utils/
-
-# Security check
-safety check
-bandit -r scripts/ utils/
-
-# Build package
-python -m build
+### GitHub Actions URL
+```
+https://github.com/jhazured/databricks-delta-lake-project/actions
 ```
 
-## ⚡ Performance Tips
+## 🎯 Best Practices
 
-### Faster Builds
-- Dependencies are cached automatically
-- Matrix testing runs in parallel
-- Use appropriate test markers
+### Before Pushing
+1. Run local tests: `pytest`
+2. Check formatting: `black --check .`
+3. Verify linting: `flake8 .`
+4. Test Docker builds locally
 
-### Cost Optimization
-- Matrix testing: 6 jobs per push
-- Security scans: Daily (5-10 min)
-- Performance tests: Main branch only
+### Code Review
+- Check CI/CD status
+- Review test coverage
+- Verify security scans
+- Validate infrastructure changes
 
-### Estimated Costs
-- **Public repo**: Free
-- **Private repo**: ~$0-20/month (typical usage)
+### Deployment
+- Test in dev environment first
+- Monitor deployment logs
+- Verify functionality post-deployment
+- Update documentation
 
-## 📚 Resources
+## 🔄 Workflow Triggers
 
-- [GitHub Actions Docs](https://docs.github.com/en/actions)
-- [Pytest Documentation](https://docs.pytest.org/)
-- [Databricks CLI Docs](https://docs.databricks.com/dev-tools/cli/)
-- [Black Code Formatter](https://black.readthedocs.io/)
-- [MyPy Type Checker](https://mypy.readthedocs.io/)
+| Trigger | Condition | Actions |
+|---------|-----------|---------|
+| **Push to main** | Code changes | Full pipeline + deployment |
+| **Push to develop** | Code changes | Full pipeline (no deployment) |
+| **Pull Request** | PR to main | Validation + testing |
+| **Schedule** | Daily 2 AM UTC | Security scans only |
+| **Manual** | Workflow dispatch | Deploy to chosen environment |
 
-## 🆘 Getting Help
+## 📝 Quick Links
 
-1. Check workflow logs in GitHub Actions
-2. Review this documentation
-3. Check project README
-4. Create an issue in the repository
+- **Full Documentation**: [CI-CD-Workflow-Documentation.md](./CI-CD-Workflow-Documentation.md)
+- **Pipeline Diagram**: [CI-CD-Pipeline-Diagram.txt](./CI-CD-Pipeline-Diagram.txt)
+- **GitHub Actions**: https://github.com/jhazured/databricks-delta-lake-project/actions
+- **Project Setup**: [TRIAL-SETUP-GUIDE.md](./TRIAL-SETUP-GUIDE.md)
 
 ---
 
-*Last updated: 2024-01-XX*
+*Quick reference for the Databricks Delta Lake CI/CD pipeline*
