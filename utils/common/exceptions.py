@@ -33,14 +33,19 @@ class DeltaLakeError(Exception):
             "error_type": self.__class__.__name__,
             "message": self.message,
             "error_code": self.error_code,
-            "details": self.details
+            "details": self.details,
         }
 
 
 class ValidationError(DeltaLakeError):
     """Exception raised for data validation errors."""
 
-    def __init__(self, message: str, field: Optional[str] = None, value: Optional[Any] = None):
+    def __init__(
+        self,
+        message: str,
+        field: Optional[str] = None,
+        value: Optional[Any] = None,
+    ):
         """
         Initialize validation error.
 
