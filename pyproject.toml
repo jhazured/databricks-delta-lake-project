@@ -1,0 +1,173 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "databricks-delta-lake-project"
+version = "1.0.0"
+description = "Enterprise-grade data lake platform for analytics and machine learning"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Organization", email = "data-team@your-org.com"}
+]
+maintainers = [
+    {name = "Data Engineering Team", email = "data-engineering@your-org.com"}
+]
+keywords = ["databricks", "data-lake", "delta-lake", "analytics", "ml", "enterprise"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "databricks-cli>=0.17.0",
+    "databricks-connect>=13.0.0",
+    "delta-spark>=2.4.0",
+    "pyspark>=3.4.0",
+    "pandas>=1.5.0",
+    "numpy>=1.24.0",
+    "scikit-learn>=1.3.0",
+    "mlflow>=2.5.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    "requests>=2.31.0",
+    "boto3>=1.28.0",
+    "azure-storage-blob>=12.17.0",
+    "google-cloud-storage>=2.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.0.0",
+    "isort>=5.12.0",
+]
+ml = [
+    "xgboost>=1.7.0",
+    "lightgbm>=4.0.0",
+    "catboost>=1.2.0",
+    "torch>=2.0.0",
+    "tensorflow>=2.13.0",
+]
+monitoring = [
+    "prometheus-client>=0.17.0",
+    "grafana-api>=1.0.3",
+    "psutil>=5.9.0",
+]
+streaming = [
+    "kafka-python>=2.0.0",
+    "azure-eventhub>=5.11.0",
+    "pika>=1.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/databricks-delta-lake-project"
+Documentation = "https://github.com/your-org/databricks-delta-lake-project/tree/main/documentation"
+Repository = "https://github.com/your-org/databricks-delta-lake-project.git"
+Issues = "https://github.com/your-org/databricks-delta-lake-project/issues"
+Changelog = "https://github.com/your-org/databricks-delta-lake-project/blob/main/CHANGELOG.md"
+
+[project.scripts]
+delta-deploy = "scripts.deployment:main"
+delta-monitor = "scripts.monitoring:main"
+delta-test = "scripts.testing:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scripts*", "utils*"]
+exclude = ["tests*", "docs*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["scripts", "utils"]
+known_third_party = ["databricks", "pyspark", "mlflow", "pandas", "numpy"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+    "performance: marks tests as performance tests",
+    "security: marks tests as security tests",
+]
+
+[tool.coverage.run]
+source = ["scripts", "utils"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/env/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
