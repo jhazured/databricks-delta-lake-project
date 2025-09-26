@@ -130,7 +130,10 @@ class DatabricksConnection:
             )
             response.raise_for_status()
             self.logger.info(f"Started cluster {cluster_id}")
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to start cluster: {str(e)}", endpoint="/api/2.0/clusters/start"
@@ -157,7 +160,10 @@ class DatabricksConnection:
             )
             response.raise_for_status()
             self.logger.info(f"Stopped cluster {cluster_id}")
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to stop cluster: {str(e)}", endpoint="/api/2.0/clusters/stop"
@@ -184,7 +190,10 @@ class DatabricksConnection:
             )
             response.raise_for_status()
             self.logger.info(f"Restarted cluster {cluster_id}")
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to restart cluster: {str(e)}",
@@ -211,7 +220,10 @@ class DatabricksConnection:
                 f"{self.config.host}/api/2.0/sql/statements", json=payload
             )
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to execute SQL: {str(e)}", endpoint="/api/2.0/sql/statements"
@@ -228,7 +240,10 @@ class DatabricksConnection:
             response = self._session.get(f"{self.config.host}/api/2.0/jobs/list")
             response.raise_for_status()
             data = response.json()
-            return data.get("jobs", [])
+            jobs = data.get("jobs", [])
+            if not isinstance(jobs, list):
+                return []
+            return jobs
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to get jobs: {str(e)}", endpoint="/api/2.0/jobs/list"
@@ -247,7 +262,7 @@ class DatabricksConnection:
         Returns:
             Job run response
         """
-        payload = {"job_id": str(job_id)}
+        payload: Dict[str, Any] = {"job_id": str(job_id)}
         if parameters:
             payload["notebook_params"] = parameters
 
@@ -257,7 +272,10 @@ class DatabricksConnection:
             )
             response.raise_for_status()
             self.logger.info(f"Started job {job_id}")
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to run job: {str(e)}", endpoint="/api/2.0/jobs/run-now"
@@ -278,7 +296,10 @@ class DatabricksConnection:
                 f"{self.config.host}/api/2.0/jobs/runs/get", params={"run_id": run_id}
             )
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to get job run: {str(e)}", endpoint="/api/2.0/jobs/runs/get"
@@ -305,7 +326,10 @@ class DatabricksConnection:
                 )
                 response.raise_for_status()
                 self.logger.info(f"Uploaded file to {target_path}")
-                return response.json()
+                data = response.json()
+                if not isinstance(data, dict):
+                    return {}
+                return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to upload file: {str(e)}", endpoint="/api/2.0/workspace/import"
@@ -327,7 +351,10 @@ class DatabricksConnection:
             )
             response.raise_for_status()
             data = response.json()
-            return data.get("objects", [])
+            objects = data.get("objects", [])
+            if not isinstance(objects, list):
+                return []
+            return objects
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to list workspace: {str(e)}",
