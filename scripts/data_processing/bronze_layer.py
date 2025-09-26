@@ -201,10 +201,10 @@ class SampleDataGenerator:
             List of customer records
         """
         import random  # pylint: disable=import-outside-toplevel
-        from datetime import (
+        from datetime import (  # pylint: disable=import-outside-toplevel,reimported
             datetime,
             timedelta,
-        )  # pylint: disable=import-outside-toplevel,reimported
+        )
 
         data = []
         for i in range(count):
@@ -236,10 +236,10 @@ class SampleDataGenerator:
             List of transaction records
         """
         import random  # pylint: disable=import-outside-toplevel
-        from datetime import (
+        from datetime import (  # pylint: disable=import-outside-toplevel,reimported
             datetime,
             timedelta,
-        )  # pylint: disable=import-outside-toplevel,reimported
+        )
 
         data = []
         for i in range(count):
