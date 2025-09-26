@@ -13,7 +13,7 @@ def setup_logging(
     level: str = "INFO",
     format_string: Optional[str] = None,
     log_file: Optional[str] = None,
-    structured: bool = True
+    structured: bool = True,
 ) -> None:
     """
     Set up logging configuration for the application.

@@ -3,7 +3,7 @@
 
 terraform {
   required_version = ">= 1.5.0"
-  
+
   required_providers {
     databricks = {
       source  = "databricks/databricks"
@@ -55,11 +55,11 @@ resource "databricks_cluster" "trial_cluster" {
   
   # Trial-optimized configuration
   spark_conf = {
-    "spark.databricks.delta.preview.enabled" = "true"
-    "spark.databricks.delta.merge.enableLowShuffle" = "true"
-    "spark.sql.adaptive.enabled" = "true"
-    "spark.sql.adaptive.coalescePartitions.enabled" = "true"
-    "spark.databricks.cluster.profile" = "singleNode"
+    "spark.databricks.delta.preview.enabled"           = "true"
+    "spark.databricks.delta.merge.enableLowShuffle"    = "true"
+    "spark.sql.adaptive.enabled"                       = "true"
+    "spark.sql.adaptive.coalescePartitions.enabled"    = "true"
+    "spark.databricks.cluster.profile"                 = "singleNode"
   }
   
   # Essential libraries for trial

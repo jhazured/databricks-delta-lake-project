@@ -3,7 +3,7 @@
 
 terraform {
   required_version = ">= 1.5.0"
-  
+
   required_providers {
     databricks = {
       source  = "databricks/databricks"
@@ -288,10 +288,10 @@ resource "databricks_cluster" "data_cluster" {
   }
   
   spark_conf = {
-    "spark.databricks.delta.preview.enabled" = "true"
-    "spark.databricks.delta.merge.enableLowShuffle" = "true"
-    "spark.sql.adaptive.enabled" = "true"
-    "spark.sql.adaptive.coalescePartitions.enabled" = "true"
+    "spark.databricks.delta.preview.enabled"           = "true"
+    "spark.databricks.delta.merge.enableLowShuffle"    = "true"
+    "spark.sql.adaptive.enabled"                       = "true"
+    "spark.sql.adaptive.coalescePartitions.enabled"    = "true"
   }
   
   library {
