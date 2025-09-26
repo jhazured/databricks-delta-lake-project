@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  # Development environment
+  delta-lake-dev:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    environment:
+      - ENVIRONMENT=local
+      - LOG_LEVEL=DEBUG
+      - DATABRICKS_HOST=${DATABRICKS_HOST:-}
+      - DATABRICKS_TOKEN=${DATABRICKS_TOKEN:-}
+    command: ["python", "-m", "pytest", "testing/", "-v", "--cov=utils", "--cov=scripts"]
+    profiles:
+      - dev
+
+  # API service
+  delta-lake-api:
+    build:
+      context: .
+      target: api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=local
+      - LOG_LEVEL=INFO
+      - DATABRICKS_HOST=${DATABRICKS_HOST:-}
+      - DATABRICKS_TOKEN=${DATABRICKS_TOKEN:-}
+    depends_on:
+      - postgres
+      - redis
+    profiles:
+      - api
+
+  # Data processing service
+  delta-lake-processor:
+    build:
+      context: .
+      target: data-processing
+    volumes:
+      - ./data:/app/data
+    environment:
+      - ENVIRONMENT=local
+      - LOG_LEVEL=INFO
+      - DATABRICKS_HOST=${DATABRICKS_HOST:-}
+      - DATABRICKS_TOKEN=${DATABRICKS_TOKEN:-}
+    depends_on:
+      - postgres
+    profiles:
+      - processing
+
+  # PostgreSQL database
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=delta_lake
+      - POSTGRES_USER=delta_user
+      - POSTGRES_PASSWORD=delta_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    profiles:
+      - database
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    profiles:
+      - cache
+
+  # Monitoring stack
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infrastructure/docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    profiles:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infrastructure/docker/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./infrastructure/docker/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+
+  # Jupyter notebook for development
+  jupyter:
+    build:
+      context: .
+      target: development
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    environment:
+      - ENVIRONMENT=local
+      - LOG_LEVEL=DEBUG
+    command: ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+    profiles:
+      - jupyter
+
+  # Testing environment
+  test:
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+    environment:
+      - ENVIRONMENT=test
+      - LOG_LEVEL=DEBUG
+      - DATABRICKS_HOST=test-host
+      - DATABRICKS_TOKEN=test-token
+    command: ["python", "-m", "pytest", "testing/", "-v", "--cov=utils", "--cov=scripts", "--cov-report=xml"]
+    profiles:
+      - test
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: delta-lake-network

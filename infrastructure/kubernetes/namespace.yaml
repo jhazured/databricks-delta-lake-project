@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: delta-lake
+  labels:
+    name: delta-lake
+    environment: production
+    project: databricks-delta-lake

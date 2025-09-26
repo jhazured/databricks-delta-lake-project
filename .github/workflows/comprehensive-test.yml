@@ -1,0 +1,364 @@
+name: Comprehensive Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run comprehensive tests daily at 3 AM UTC
+    - cron: '0 3 * * *'
+
+env:
+  PYTHON_VERSION: '3.11'
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  # Code Quality and Linting
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/pyproject.toml') }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Lint with flake8
+      run: |
+        flake8 utils/ scripts/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 utils/ scripts/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+    
+    - name: Check code formatting with black
+      run: |
+        black --check utils/ scripts/
+    
+    - name: Check import sorting with isort
+      run: |
+        isort --check-only utils/ scripts/
+    
+    - name: Type checking with mypy
+      run: |
+        mypy utils/ scripts/ --ignore-missing-imports
+
+  # Unit Tests
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Run unit tests
+      run: |
+        pytest testing/unit/ -v --cov=utils --cov=scripts --cov-report=xml --cov-report=term-missing
+    
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Integration Tests
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [code-quality, unit-tests]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Run integration tests
+      run: |
+        pytest testing/integration/ -v -m "not slow"
+      env:
+        TEST_MODE: "ci"
+        DATABRICKS_HOST: "test-host"
+        DATABRICKS_TOKEN: "test-token"
+
+  # Docker Build and Test
+  docker-tests:
+    runs-on: ubuntu-latest
+    needs: [code-quality]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Build development image
+      run: |
+        docker build --target development -t delta-lake-dev:latest .
+    
+    - name: Build production image
+      run: |
+        docker build --target production -t delta-lake-prod:latest .
+    
+    - name: Build API image
+      run: |
+        docker build --target api -t delta-lake-api:latest .
+    
+    - name: Build data processing image
+      run: |
+        docker build --target data-processing -t delta-lake-processor:latest .
+    
+    - name: Test development image
+      run: |
+        docker run --rm delta-lake-dev:latest python -m pytest testing/unit/ -v
+    
+    - name: Test production image
+      run: |
+        docker run --rm delta-lake-prod:latest python -c "import utils.common; print('Import successful')"
+    
+    - name: Test API image
+      run: |
+        docker run --rm -d --name test-api -p 8000:8000 delta-lake-api:latest
+        sleep 10
+        curl -f http://localhost:8000/health || exit 1
+        docker stop test-api
+
+  # Kubernetes Manifest Validation
+  kubernetes-validation:
+    runs-on: ubuntu-latest
+    needs: [docker-tests]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: Validate Kubernetes manifests
+      run: |
+        # Validate YAML syntax
+        for file in infrastructure/kubernetes/*.yaml; do
+          echo "Validating $file"
+          kubectl --dry-run=client apply -f "$file"
+        done
+    
+    - name: Check Kubernetes best practices
+      run: |
+        # Check for common issues
+        echo "Checking for hardcoded secrets..."
+        grep -r "password\|secret\|token" infrastructure/kubernetes/ || echo "No hardcoded secrets found"
+        
+        echo "Checking for resource limits..."
+        grep -r "resources:" infrastructure/kubernetes/ || echo "No resource limits found"
+
+  # Terraform Validation
+  terraform-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: '1.5.0'
+    
+    - name: Terraform Format Check
+      run: |
+        cd infrastructure/terraform
+        terraform fmt -check -recursive
+    
+    - name: Terraform Init
+      run: |
+        cd infrastructure/terraform
+        terraform init -backend=false
+    
+    - name: Terraform Validate
+      run: |
+        cd infrastructure/terraform
+        terraform validate
+    
+    - name: Terraform Plan (Dry Run)
+      run: |
+        cd infrastructure/terraform
+        terraform plan -var="databricks_host=test-host" -var="databricks_token=test-token" -var="environment=test"
+
+  # Security Scanning
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit semgrep
+    
+    - name: Run safety check
+      run: |
+        safety check --json --output safety-report.json || true
+    
+    - name: Run bandit security linter
+      run: |
+        bandit -r utils/ scripts/ -f json -o bandit-report.json || true
+    
+    - name: Run Semgrep security scan
+      run: |
+        semgrep --config=auto --json --output=semgrep-report.json utils/ scripts/ || true
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+          semgrep-report.json
+
+  # Performance Tests
+  performance-tests:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [integration-tests]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Run performance tests
+      run: |
+        pytest testing/performance/ -v --benchmark-only --benchmark-save=performance-baseline
+      env:
+        TEST_MODE: "performance"
+
+  # End-to-End Tests
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [docker-tests, kubernetes-validation]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+    
+    - name: Run end-to-end tests
+      run: |
+        pytest testing/e2e/ -v -m "not slow"
+      env:
+        TEST_MODE: "e2e"
+        DATABRICKS_HOST: "test-host"
+        DATABRICKS_TOKEN: "test-token"
+
+  # Build and Package
+  build-package:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, security-scan]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine
+    
+    - name: Build package
+      run: |
+        python -m build
+    
+    - name: Check package
+      run: |
+        twine check dist/*
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-package-distributions
+        path: dist/
+
+  # Test Results Summary
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [code-quality, unit-tests, integration-tests, docker-tests, kubernetes-validation, terraform-validation, security-scan]
+    if: always()
+    
+    steps:
+    - name: Test Results Summary
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Code Quality | ${{ needs.code-quality.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Docker Tests | ${{ needs.docker-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Kubernetes Validation | ${{ needs.kubernetes-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Terraform Validation | ${{ needs.terraform-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
