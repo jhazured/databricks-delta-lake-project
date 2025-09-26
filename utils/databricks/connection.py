@@ -70,7 +70,10 @@ class DatabricksConnection:
             response = self._session.get(f"{self.config.host}/api/2.0/clusters/list")
             response.raise_for_status()
             data = response.json()
-            return data.get("clusters", [])
+            clusters = data.get("clusters", [])
+            if not isinstance(clusters, list):
+                return []
+            return clusters
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to get clusters: {str(e)}", endpoint="/api/2.0/clusters/list"
@@ -96,7 +99,10 @@ class DatabricksConnection:
                 params={"cluster_id": cluster_id},
             )
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            if not isinstance(data, dict):
+                return {}
+            return data
         except requests.RequestException as e:
             raise APIError(
                 f"Failed to get cluster info: {str(e)}",
@@ -241,7 +247,7 @@ class DatabricksConnection:
         Returns:
             Job run response
         """
-        payload = {"job_id": job_id}
+        payload = {"job_id": str(job_id)}
         if parameters:
             payload["notebook_params"] = parameters
 

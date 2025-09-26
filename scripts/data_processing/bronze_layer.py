@@ -147,11 +147,11 @@ class BronzeLayerProcessor:
             Path where data was saved
         """
         try:
-            output_path = Path(output_path)
-            output_path.mkdir(parents=True, exist_ok=True)
+            output_dir = Path(output_path)
+            output_dir.mkdir(parents=True, exist_ok=True)
 
             # Save as Parquet for efficient storage
-            file_path = output_path / f"{table_name}_bronze.parquet"
+            file_path = output_dir / f"{table_name}_bronze.parquet"
             df.to_parquet(file_path, index=False)
 
             self.logger.info(f"Saved bronze data to: {file_path}")

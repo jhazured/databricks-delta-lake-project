@@ -191,7 +191,7 @@ class SchemaValidator:
         if value is None:
             return True  # None is allowed for optional fields
 
-        type_mapping = {
+        type_mapping: Dict[str, Any] = {
             "string": str,
             "integer": int,
             "number": (int, float, Decimal),
