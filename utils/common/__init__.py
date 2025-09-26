@@ -2,18 +2,16 @@
 Common utilities for the Delta Lake project.
 """
 
-from .logging import setup_logging, get_logger
-from .config import ConfigManager, load_config
-from .validation import DataValidator, SchemaValidator
+from .logging import setup_logging
+from .config import load_config
+from .validation import validate_schema, validate_data_quality
 from .exceptions import DeltaLakeError, ValidationError, ConfigurationError
 
 __all__ = [
     "setup_logging",
-    "get_logger",
-    "ConfigManager",
     "load_config",
-    "DataValidator",
-    "SchemaValidator",
+    "validate_schema",
+    "validate_data_quality",
     "DeltaLakeError",
     "ValidationError",
     "ConfigurationError",
