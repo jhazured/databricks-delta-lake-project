@@ -134,14 +134,12 @@ resource "aws_s3_bucket_versioning" "data_lake" {
   }
 }
 
-resource "aws_s3_bucket_encryption" "data_lake" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
     }
   }
 }
@@ -152,6 +150,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
   rule {
     id     = "data_lifecycle"
     status = "Enabled"
+
+    filter {
+      prefix = ""
+    }
 
     transition {
       days          = 30
@@ -317,8 +319,6 @@ resource "databricks_cluster" "data_cluster" {
       package = "numpy==1.24.3"
     }
   }
-
-  tags = var.tags
 }
 
 # =============================================================================
@@ -328,45 +328,51 @@ resource "databricks_cluster" "data_cluster" {
 resource "databricks_job" "bronze_to_silver" {
   name = "${var.project_name}-${var.environment}-bronze-to-silver"
 
-  new_cluster {
-    num_workers   = 2
-    spark_version = "13.3.x-scala2.12"
-    node_type_id  = "i3.xlarge"
+  task {
+    task_key = "bronze_to_silver_task"
 
-    aws_attributes {
-      zone_id              = "us-west-2a"
-      instance_profile_arn = aws_iam_role.databricks_role.arn
+    new_cluster {
+      num_workers   = 2
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "i3.xlarge"
+
+      aws_attributes {
+        zone_id              = "us-west-2a"
+        instance_profile_arn = aws_iam_role.databricks_role.arn
+      }
     }
-  }
 
-  notebook_task {
-    notebook_path = "/workflows/delta_live_tables/silver_layer_transformations"
+    notebook_task {
+      notebook_path = "/workflows/delta_live_tables/silver_layer_transformations"
+    }
   }
 
   schedule {
     quartz_cron_expression = "0 0 * * * ?"
     timezone_id            = "UTC"
   }
-
-  tags = var.tags
 }
 
 resource "databricks_job" "silver_to_gold" {
   name = "${var.project_name}-${var.environment}-silver-to-gold"
 
-  new_cluster {
-    num_workers   = 2
-    spark_version = "13.3.x-scala2.12"
-    node_type_id  = "i3.xlarge"
+  task {
+    task_key = "silver_to_gold_task"
 
-    aws_attributes {
-      zone_id              = "us-west-2a"
-      instance_profile_arn = aws_iam_role.databricks_role.arn
+    new_cluster {
+      num_workers   = 2
+      spark_version = "13.3.x-scala2.12"
+      node_type_id  = "i3.xlarge"
+
+      aws_attributes {
+        zone_id              = "us-west-2a"
+        instance_profile_arn = aws_iam_role.databricks_role.arn
+      }
     }
-  }
 
-  notebook_task {
-    notebook_path = "/workflows/delta_live_tables/gold_layer_transformations"
+    notebook_task {
+      notebook_path = "/workflows/delta_live_tables/gold_layer_transformations"
+    }
   }
 
   schedule {
@@ -375,8 +381,6 @@ resource "databricks_job" "silver_to_gold" {
   }
 
   depends_on = [databricks_job.bronze_to_silver]
-
-  tags = var.tags
 }
 
 # =============================================================================
