@@ -48,45 +48,45 @@ provider "databricks" {
 resource "databricks_cluster" "trial_cluster" {
   cluster_name            = "delta-lake-trial-cluster"
   spark_version           = "13.3.x-scala2.12"
-  node_type_id            = "i3.xlarge"  # Single node for trial
+  node_type_id            = "i3.xlarge" # Single node for trial
   driver_node_type_id     = "i3.xlarge"
   num_workers             = 0  # Single node cluster for trial
-  autotermination_minutes = 30  # Auto-terminate to save credits
-  
+  autotermination_minutes = 30 # Auto-terminate to save credits
+
   # Trial-optimized configuration
   spark_conf = {
-    "spark.databricks.delta.preview.enabled"           = "true"
-    "spark.databricks.delta.merge.enableLowShuffle"    = "true"
-    "spark.sql.adaptive.enabled"                       = "true"
-    "spark.sql.adaptive.coalescePartitions.enabled"    = "true"
-    "spark.databricks.cluster.profile"                 = "singleNode"
+    "spark.databricks.delta.preview.enabled"        = "true"
+    "spark.databricks.delta.merge.enableLowShuffle" = "true"
+    "spark.sql.adaptive.enabled"                    = "true"
+    "spark.sql.adaptive.coalescePartitions.enabled" = "true"
+    "spark.databricks.cluster.profile"              = "singleNode"
   }
-  
+
   # Essential libraries for trial
   library {
     pypi {
       package = "delta-spark==2.4.0"
     }
   }
-  
+
   library {
     pypi {
       package = "pandas==2.0.3"
     }
   }
-  
+
   library {
     pypi {
       package = "pyspark==3.4.0"
     }
   }
-  
+
   library {
     pypi {
       package = "mlflow==2.5.0"
     }
   }
-  
+
   tags = {
     Environment = "trial"
     Purpose     = "development"
@@ -101,7 +101,7 @@ resource "databricks_cluster" "trial_cluster" {
 # Try to create schemas, but don't fail if Unity Catalog isn't available
 resource "databricks_schema" "bronze" {
   count        = var.databricks_host != "" ? 1 : 0
-  catalog_name = "main"  # Use default catalog
+  catalog_name = "main" # Use default catalog
   name         = "bronze"
   comment      = "Bronze layer for raw data"
 }
@@ -126,21 +126,21 @@ resource "databricks_schema" "gold" {
 
 resource "databricks_job" "trial_pipeline" {
   name = "delta-lake-trial-pipeline"
-  
+
   # Use existing cluster to save credits
   existing_cluster_id = databricks_cluster.trial_cluster.id
-  
+
   # Simple notebook task for trial
   notebook_task {
     notebook_path = "/Workspace/Shared/delta_lake_trial_pipeline"
   }
-  
+
   # Run once per day to save credits
   schedule {
     quartz_cron_expression = "0 0 * * * ?"
-    timezone_id           = "UTC"
+    timezone_id            = "UTC"
   }
-  
+
   tags = {
     Environment = "trial"
     Purpose     = "learning"

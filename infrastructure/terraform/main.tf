@@ -43,7 +43,7 @@ variable "environment" {
   description = "Environment name (dev, staging, prod)"
   type        = string
   default     = "dev"
-  
+
   validation {
     condition     = contains(["dev", "staging", "prod"], var.environment)
     error_message = "Environment must be one of: dev, staging, prod."
@@ -90,7 +90,7 @@ variable "tags" {
 
 provider "aws" {
   region = var.region
-  
+
   default_tags {
     tags = var.tags
   }
@@ -114,7 +114,7 @@ data "aws_region" "current" {}
 
 resource "aws_s3_bucket" "data_lake" {
   bucket = "${var.project_name}-${var.environment}-data-lake-${random_string.bucket_suffix.result}"
-  
+
   tags = merge(var.tags, {
     Name = "Delta Lake Data Lake"
     Type = "data-lake"
@@ -136,7 +136,7 @@ resource "aws_s3_bucket_versioning" "data_lake" {
 
 resource "aws_s3_bucket_encryption" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
-  
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -148,21 +148,21 @@ resource "aws_s3_bucket_encryption" "data_lake" {
 
 resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
   bucket = aws_s3_bucket.data_lake.id
-  
+
   rule {
     id     = "data_lifecycle"
     status = "Enabled"
-    
+
     transition {
       days          = 30
       storage_class = "STANDARD_IA"
     }
-    
+
     transition {
       days          = 90
       storage_class = "GLACIER"
     }
-    
+
     transition {
       days          = 365
       storage_class = "DEEP_ARCHIVE"
@@ -176,7 +176,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "data_lake" {
 
 resource "aws_iam_role" "databricks_role" {
   name = "${var.project_name}-${var.environment}-databricks-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -189,13 +189,13 @@ resource "aws_iam_role" "databricks_role" {
       }
     ]
   })
-  
+
   tags = var.tags
 }
 
 resource "aws_iam_policy" "databricks_policy" {
   name = "${var.project_name}-${var.environment}-databricks-policy"
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -228,7 +228,7 @@ resource "aws_iam_role_policy_attachment" "databricks_policy" {
 resource "databricks_catalog" "data_catalog" {
   name    = "${var.project_name}_${var.environment}_catalog"
   comment = "Delta Lake data catalog for ${var.environment} environment"
-  
+
   properties = {
     purpose = "data-analytics"
   }
@@ -278,46 +278,46 @@ resource "databricks_cluster" "data_cluster" {
   enable_elastic_disk     = true
   data_security_mode      = "SINGLE_USER"
   runtime_engine          = "STANDARD"
-  
+
   aws_attributes {
-    zone_id                = "us-west-2a"
-    instance_profile_arn   = aws_iam_role.databricks_role.arn
-    ebs_volume_type        = "gp3"
-    ebs_volume_size        = 100
-    ebs_volume_count       = 1
+    zone_id              = "us-west-2a"
+    instance_profile_arn = aws_iam_role.databricks_role.arn
+    ebs_volume_type      = "gp3"
+    ebs_volume_size      = 100
+    ebs_volume_count     = 1
   }
-  
+
   spark_conf = {
-    "spark.databricks.delta.preview.enabled"           = "true"
-    "spark.databricks.delta.merge.enableLowShuffle"    = "true"
-    "spark.sql.adaptive.enabled"                       = "true"
-    "spark.sql.adaptive.coalescePartitions.enabled"    = "true"
+    "spark.databricks.delta.preview.enabled"        = "true"
+    "spark.databricks.delta.merge.enableLowShuffle" = "true"
+    "spark.sql.adaptive.enabled"                    = "true"
+    "spark.sql.adaptive.coalescePartitions.enabled" = "true"
   }
-  
+
   library {
     pypi {
       package = "mlflow==2.5.0"
     }
   }
-  
+
   library {
     pypi {
       package = "scikit-learn==1.3.0"
     }
   }
-  
+
   library {
     pypi {
       package = "pandas==2.0.3"
     }
   }
-  
+
   library {
     pypi {
       package = "numpy==1.24.3"
     }
   }
-  
+
   tags = var.tags
 }
 
@@ -327,55 +327,55 @@ resource "databricks_cluster" "data_cluster" {
 
 resource "databricks_job" "bronze_to_silver" {
   name = "${var.project_name}-${var.environment}-bronze-to-silver"
-  
+
   new_cluster {
     num_workers   = 2
     spark_version = "13.3.x-scala2.12"
     node_type_id  = "i3.xlarge"
-    
+
     aws_attributes {
       zone_id              = "us-west-2a"
       instance_profile_arn = aws_iam_role.databricks_role.arn
     }
   }
-  
+
   notebook_task {
     notebook_path = "/workflows/delta_live_tables/silver_layer_transformations"
   }
-  
+
   schedule {
     quartz_cron_expression = "0 0 * * * ?"
-    timezone_id           = "UTC"
+    timezone_id            = "UTC"
   }
-  
+
   tags = var.tags
 }
 
 resource "databricks_job" "silver_to_gold" {
   name = "${var.project_name}-${var.environment}-silver-to-gold"
-  
+
   new_cluster {
     num_workers   = 2
     spark_version = "13.3.x-scala2.12"
     node_type_id  = "i3.xlarge"
-    
+
     aws_attributes {
       zone_id              = "us-west-2a"
       instance_profile_arn = aws_iam_role.databricks_role.arn
     }
   }
-  
+
   notebook_task {
     notebook_path = "/workflows/delta_live_tables/gold_layer_transformations"
   }
-  
+
   schedule {
     quartz_cron_expression = "0 1 * * * ?"
-    timezone_id           = "UTC"
+    timezone_id            = "UTC"
   }
-  
+
   depends_on = [databricks_job.bronze_to_silver]
-  
+
   tags = var.tags
 }
 

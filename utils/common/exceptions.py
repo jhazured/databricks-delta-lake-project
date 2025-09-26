@@ -7,11 +7,13 @@ from typing import Optional, Dict, Any
 
 class DeltaLakeError(Exception):
     """Base exception for Delta Lake project."""
-    
-    def __init__(self, message: str, error_code: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
+
+    def __init__(
+        self, message: str, error_code: Optional[str] = None, details: Optional[Dict[str, Any]] = None
+    ):
         """
         Initialize Delta Lake error.
-        
+
         Args:
             message: Error message
             error_code: Optional error code
@@ -21,7 +23,7 @@ class DeltaLakeError(Exception):
         self.message = message
         self.error_code = error_code
         self.details = details or {}
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert error to dictionary."""
         return {
@@ -34,11 +36,11 @@ class DeltaLakeError(Exception):
 
 class ValidationError(DeltaLakeError):
     """Exception raised for data validation errors."""
-    
+
     def __init__(self, message: str, field: Optional[str] = None, value: Optional[Any] = None):
         """
         Initialize validation error.
-        
+
         Args:
             message: Error message
             field: Field that failed validation
@@ -55,11 +57,11 @@ class ValidationError(DeltaLakeError):
 
 class ConfigurationError(DeltaLakeError):
     """Exception raised for configuration errors."""
-    
+
     def __init__(self, message: str, config_key: Optional[str] = None):
         """
         Initialize configuration error.
-        
+
         Args:
             message: Error message
             config_key: Configuration key that caused the error
@@ -73,11 +75,11 @@ class ConfigurationError(DeltaLakeError):
 
 class DataProcessingError(DeltaLakeError):
     """Exception raised for data processing errors."""
-    
+
     def __init__(self, message: str, stage: Optional[str] = None, data_source: Optional[str] = None):
         """
         Initialize data processing error.
-        
+
         Args:
             message: Error message
             stage: Processing stage where error occurred
@@ -94,11 +96,11 @@ class DataProcessingError(DeltaLakeError):
 
 class MLModelError(DeltaLakeError):
     """Exception raised for ML model errors."""
-    
+
     def __init__(self, message: str, model_name: Optional[str] = None, model_version: Optional[str] = None):
         """
         Initialize ML model error.
-        
+
         Args:
             message: Error message
             model_name: Name of the model that caused the error
@@ -115,11 +117,11 @@ class MLModelError(DeltaLakeError):
 
 class APIError(DeltaLakeError):
     """Exception raised for API errors."""
-    
+
     def __init__(self, message: str, status_code: Optional[int] = None, endpoint: Optional[str] = None):
         """
         Initialize API error.
-        
+
         Args:
             message: Error message
             status_code: HTTP status code
@@ -136,11 +138,11 @@ class APIError(DeltaLakeError):
 
 class SecurityError(DeltaLakeError):
     """Exception raised for security-related errors."""
-    
+
     def __init__(self, message: str, security_event: Optional[str] = None, user: Optional[str] = None):
         """
         Initialize security error.
-        
+
         Args:
             message: Error message
             security_event: Type of security event
@@ -157,11 +159,11 @@ class SecurityError(DeltaLakeError):
 
 class InfrastructureError(DeltaLakeError):
     """Exception raised for infrastructure errors."""
-    
+
     def __init__(self, message: str, resource_type: Optional[str] = None, resource_name: Optional[str] = None):
         """
         Initialize infrastructure error.
-        
+
         Args:
             message: Error message
             resource_type: Type of infrastructure resource
@@ -178,11 +180,11 @@ class InfrastructureError(DeltaLakeError):
 
 class MonitoringError(DeltaLakeError):
     """Exception raised for monitoring errors."""
-    
+
     def __init__(self, message: str, metric_name: Optional[str] = None, alert_type: Optional[str] = None):
         """
         Initialize monitoring error.
-        
+
         Args:
             message: Error message
             metric_name: Name of the metric that caused the error

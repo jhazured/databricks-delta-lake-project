@@ -9,12 +9,12 @@ from .exceptions import DeltaLakeError, ValidationError, ConfigurationError
 
 __all__ = [
     "setup_logging",
-    "get_logger", 
+    "get_logger",
     "ConfigManager",
     "load_config",
     "DataValidator",
     "SchemaValidator",
     "DeltaLakeError",
     "ValidationError",
-    "ConfigurationError"
+    "ConfigurationError",
 ]

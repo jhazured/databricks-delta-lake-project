@@ -11,7 +11,7 @@ from .workspace_manager import WorkspaceManager
 __all__ = [
     "DatabricksConnection",
     "get_databricks_connection",
-    "DeltaOperations", 
+    "DeltaOperations",
     "DeltaTableManager",
     "ClusterManager",
     "JobManager",

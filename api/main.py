@@ -83,7 +83,7 @@ async def delta_lake_error_handler(request, exc: DeltaLakeError):
         error_code=exc.error_code,
         details=exc.details
     )
-    
+
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content=ErrorResponse(
@@ -101,7 +101,7 @@ async def general_exception_handler(request, exc: Exception):
         error_type=exc.__class__.__name__,
         error_message=str(exc)
     )
-    
+
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=ErrorResponse(
@@ -136,7 +136,7 @@ async def query_data(
 ):
     """
     Execute data query.
-    
+
     Note: This is a mock implementation for testing.
     In production, this would connect to Databricks.
     """
@@ -146,27 +146,27 @@ async def query_data(
             query=request.query,
             limit=request.limit
         )
-        
+
         # Mock data response
         mock_data = [
             {"id": 1, "name": "Sample Data 1", "value": 100.0},
             {"id": 2, "name": "Sample Data 2", "value": 200.0},
             {"id": 3, "name": "Sample Data 3", "value": 300.0}
         ]
-        
+
         # Simulate query execution time
         import time
         start_time = time.time()
         time.sleep(0.1)  # Simulate processing time
         execution_time = (time.time() - start_time) * 1000
-        
+
         return DataQueryResponse(
             data=mock_data[:request.limit],
             total_rows=len(mock_data),
             execution_time_ms=execution_time,
             query=request.query
         )
-        
+
     except Exception as e:
         raise APIError(f"Failed to execute query: {str(e)}", endpoint="/api/v1/data/query")
 
@@ -179,7 +179,7 @@ async def list_tables(config: Dict[str, Any] = Depends(get_app_config)):
         {"name": "transactions", "schema": "bronze", "rows": 5000},
         {"name": "customer_summary", "schema": "gold", "rows": 1000}
     ]
-    
+
     return {"tables": tables}
 
 @app.get("/api/v1/data/tables/{table_name}/schema")
@@ -204,13 +204,13 @@ async def get_table_schema(table_name: str):
             ]
         }
     }
-    
+
     if table_name not in mock_schemas:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Table '{table_name}' not found"
         )
-    
+
     return mock_schemas[table_name]
 
 # Monitoring endpoints
@@ -225,7 +225,7 @@ async def get_metrics():
         "active_connections": 12,
         "timestamp": datetime.utcnow()
     }
-    
+
     return metrics
 
 @app.get("/api/v1/monitoring/health")
@@ -240,7 +240,7 @@ async def get_detailed_health():
         },
         "timestamp": datetime.utcnow()
     }
-    
+
     return health_info
 
 # ML endpoints
@@ -257,7 +257,7 @@ async def list_models():
             "created_at": "2024-01-01T00:00:00Z"
         },
         {
-            "id": "model_002", 
+            "id": "model_002",
             "name": "Transaction Fraud Detection",
             "version": "2.1.0",
             "status": "active",
@@ -265,7 +265,7 @@ async def list_models():
             "created_at": "2024-01-15T00:00:00Z"
         }
     ]
-    
+
     return {"models": models}
 
 @app.post("/api/v1/ml/models/{model_id}/predict")
@@ -276,13 +276,13 @@ async def predict(model_id: str, data: Dict[str, Any]):
         "model_001": {"prediction": "churn", "confidence": 0.85, "probability": 0.78},
         "model_002": {"prediction": "fraud", "confidence": 0.92, "probability": 0.91}
     }
-    
+
     if model_id not in predictions:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Model '{model_id}' not found"
         )
-    
+
     return predictions[model_id]
 
 # Startup and shutdown events
@@ -290,7 +290,7 @@ async def predict(model_id: str, data: Dict[str, Any]):
 async def startup_event():
     """Application startup event."""
     structured_logger.info("Delta Lake API starting up")
-    
+
     # Initialize connections, load models, etc.
     try:
         config = get_config()
@@ -306,7 +306,7 @@ async def startup_event():
 async def shutdown_event():
     """Application shutdown event."""
     structured_logger.info("Delta Lake API shutting down")
-    
+
     # Cleanup resources, close connections, etc.
 
 if __name__ == "__main__":
