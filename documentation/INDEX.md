@@ -330,13 +330,14 @@ utils/
 ### **📊 Project Management**
 - [documentation/CHANGELOG.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CHANGELOG.md) - Version history
 - [documentation/COMPREHENSIVE-TODO.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/COMPREHENSIVE-TODO.md) - Project roadmap and tasks
+- [documentation/IMPROVEMENT-ROADMAP.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/IMPROVEMENT-ROADMAP.md) - Comprehensive improvement roadmap and implementation plan
 - [documentation/CONTRIBUTING.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CONTRIBUTING.md) - Contribution guidelines
 
 ## 📝 File Types Overview
 
 | File Type | Count | Purpose |
 |-----------|-------|---------|
-| **Markdown (.md)** | 15 | Documentation, policies, and guides |
+| **Markdown (.md)** | 16 | Documentation, policies, and guides |
 | **Python (.py)** | 8 | Application code, utilities, and tests |
 | **YAML (.yml/.yaml)** | 5 | Configuration, CI/CD, and Kubernetes |
 | **Terraform (.tf)** | 1 | Infrastructure as Code |
@@ -346,11 +347,11 @@ utils/
 
 ## 🎯 Repository Statistics
 
-- **Total Important Files**: 37 files
+- **Total Important Files**: 38 files
 - **Total Lines**: 3,000+ lines of code and documentation
 - **Languages**: Python, Terraform, YAML, Markdown, Shell
 - **Frameworks**: Databricks, Delta Lake, MLflow, Terraform, GitHub Actions, FastAPI, Kubernetes
-- **Test Coverage**: 59% overall code coverage
+- **Test Coverage**: 69% overall code coverage (improved from 59%)
 - **Test Suite**: 36 tests (unit, integration, performance)
 
 ## 🏆 Key Features
