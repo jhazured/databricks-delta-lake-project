@@ -61,6 +61,8 @@ dev = [
     "pydocstyle>=6.0.0",
     "vulture>=2.0.0",
     "radon>=6.0.0",
+    "pip-audit>=2.6.0",
+    "pip-licenses>=4.3.0",
 ]
 ml = [
     "xgboost>=1.7.0",
