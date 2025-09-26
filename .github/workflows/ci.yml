@@ -139,7 +139,7 @@ jobs:
     
     - name: Type checking with mypy
       run: |
-        mypy scripts/ utils/ --ignore-missing-imports
+        mypy utils/ scripts/ api/
     
     - name: Run unit tests
       run: |
