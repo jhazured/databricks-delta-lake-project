@@ -86,6 +86,11 @@ service-account.json
 htmlcov/
 .pytest_cache/
 
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
 # Documentation
 docs/_build/
 site/
@@ -103,3 +108,42 @@ site/
 *.tfvars.json
 .terraformrc
 terraform.rc
+
+# Docker
+.dockerignore
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Jupyter Notebook outputs
+*.ipynb
+
+# Model artifacts and large files
+*.pkl
+*.joblib
+*.h5
+*.pb
+models/
+artifacts/
+
+# IDE specific
+*.sublime-project
+*.sublime-workspace
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# OS generated files
+.DS_Store?
+ehthumbs.db
+Icon?
+
+# Local configuration overrides
+config/local/
+config/secrets/
+*.local.yml
+*.local.yaml
+*.local.json
