@@ -1,6 +1,4 @@
-"""
-FastAPI main application for Delta Lake project.
-"""
+"""FastAPI main application for Delta Lake project."""
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -156,7 +154,8 @@ async def readiness_check() -> Dict[str, str]:
 # Data endpoints
 @app.post("/api/v1/data/query", response_model=DataQueryResponse)
 async def query_data(
-    request: DataQueryRequest, config: Dict[str, Any] = Depends(get_app_config)  # pylint: disable=unused-argument
+    request: DataQueryRequest,
+    config: Dict[str, Any] = Depends(get_app_config),  # pylint: disable=unused-argument
 ) -> DataQueryResponse:
     """
     Execute data query.

@@ -1,8 +1,7 @@
-"""
-Bronze layer data processing pipeline.
-"""
+"""Bronze layer data processing pipeline."""
 
-from datetime import datetime
+import random
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -191,8 +190,7 @@ class SampleDataGenerator:
 
     @staticmethod
     def generate_customer_data(count: int = 1000) -> List[Dict[str, Any]]:
-        """
-        Generate sample customer data.
+        """Generate sample customer data.
 
         Args:
             count: Number of records to generate
@@ -200,12 +198,6 @@ class SampleDataGenerator:
         Returns:
             List of customer records
         """
-        import random  # pylint: disable=import-outside-toplevel
-        from datetime import (  # pylint: disable=import-outside-toplevel,reimported
-            datetime as dt,
-            timedelta,
-        )
-
         data = []
         for i in range(count):
             record = {
@@ -218,7 +210,7 @@ class SampleDataGenerator:
                 ),
                 "address": f"{random.randint(1, 9999)} Main St, City {i % 100}",
                 "registration_date": (
-                    dt.now() - timedelta(days=random.randint(1, 365))
+                    datetime.now() - timedelta(days=random.randint(1, 365))
                 ).strftime("%Y-%m-%d"),
                 "status": random.choice(["active", "inactive", "pending"]),
                 "source": "sample_generator",
@@ -229,8 +221,7 @@ class SampleDataGenerator:
 
     @staticmethod
     def generate_transaction_data(count: int = 5000) -> List[Dict[str, Any]]:
-        """
-        Generate sample transaction data.
+        """Generate sample transaction data.
 
         Args:
             count: Number of records to generate
@@ -238,12 +229,6 @@ class SampleDataGenerator:
         Returns:
             List of transaction records
         """
-        import random  # pylint: disable=import-outside-toplevel
-        from datetime import (  # pylint: disable=import-outside-toplevel,reimported
-            datetime as dt,
-            timedelta,
-        )
-
         data = []
         for i in range(count):
             record = {
@@ -252,7 +237,7 @@ class SampleDataGenerator:
                 "amount": round(random.uniform(10.0, 1000.0), 2),
                 "currency": random.choice(["USD", "EUR", "GBP"]),
                 "transaction_date": (
-                    dt.now() - timedelta(days=random.randint(1, 30))
+                    datetime.now() - timedelta(days=random.randint(1, 30))
                 ).strftime("%Y-%m-%d %H:%M:%S"),
                 "category": random.choice(
                     ["food", "transport", "entertainment", "shopping", "utilities"]

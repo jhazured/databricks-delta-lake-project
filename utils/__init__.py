@@ -1,5 +1,4 @@
-"""
-Databricks Delta Lake Project - Utility Modules
+"""Databricks Delta Lake Project - Utility Modules.
 
 This package contains utility modules for the enterprise data platform.
 """
