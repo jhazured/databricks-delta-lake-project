@@ -56,7 +56,13 @@ mlartifacts/
 *.json
 *.parquet
 *.delta
-data/
+data/*/raw_data/
+data/*/cleaned_data/
+data/*/dimensions/
+data/*/facts/
+data/*/consumption/
+data/*/processed/
+data/*/temp/
 logs/
 *.log
 
