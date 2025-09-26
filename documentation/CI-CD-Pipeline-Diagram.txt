@@ -1,0 +1,82 @@
+Databricks Delta Lake CI/CD Pipeline Flow
+==========================================
+
+Code Push/PR
+     │
+     ├── Matrix Testing (6 jobs)
+     │   ├── Python 3.9 + Java 11
+     │   ├── Python 3.9 + Java 17
+     │   ├── Python 3.10 + Java 11
+     │   ├── Python 3.10 + Java 17
+     │   ├── Python 3.11 + Java 11
+     │   └── Python 3.11 + Java 17
+     │
+     │   Each job runs:
+     │   ├── Setup (Python + Java)
+     │   ├── Cache Dependencies
+     │   ├── Install Dependencies
+     │   ├── Code Quality Checks
+     │   │   ├── flake8 (linting)
+     │   │   ├── black (formatting)
+     │   │   ├── isort (imports)
+     │   │   └── mypy (types)
+     │   ├── Unit Tests
+     │   └── Integration Tests (Python 3.11 + Java 11 only)
+     │
+     ├── Security Scan
+     │   ├── Safety (dependencies)
+     │   └── Bandit (code security)
+     │
+     └── Build Package
+         ├── Create wheel/source dist
+         ├── Validate package
+         └── Upload artifacts
+             │
+             └── Performance Test (main branch only)
+                 ├── Benchmark tests
+                 └── Baseline comparison
+                     │
+                     └── Deploy to Databricks (main branch only)
+                         ├── Download artifacts
+                         ├── Setup Databricks CLI
+                         ├── Upload to DBFS
+                         ├── Install on cluster
+                         └── Run deployment scripts
+
+Daily Schedule (2 AM UTC)
+     │
+     └── Security Scan Only
+         ├── Safety check
+         └── Bandit scan
+
+Job Dependencies:
+=================
+Test ──┐
+       ├── Build ──┐
+Security ──┘       ├── Deploy
+                   │
+Performance ───────┘
+
+Environment Requirements:
+========================
+- GitHub Secrets: DATABRICKS_TOKEN, DATABRICKS_HOST, DATABRICKS_CLUSTER_ID
+- Python: 3.9, 3.10, 3.11
+- Java: 11, 17
+- Ubuntu: latest
+
+Artifacts Generated:
+===================
+- Coverage reports (XML)
+- Security reports (JSON)
+- Build packages (wheel, source)
+- Performance baselines
+- Test results
+
+Estimated Runtime:
+==================
+- Matrix Testing: ~30-60 minutes (parallel)
+- Security Scan: ~5-10 minutes
+- Build: ~5-10 minutes
+- Performance: ~10-20 minutes
+- Deploy: ~5-15 minutes
+- Total: ~45-90 minutes per push
