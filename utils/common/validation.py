@@ -91,7 +91,9 @@ class SchemaValidator:
         """
         self.schemas[name] = schema
 
-    def validate_data(self, data: Union[Dict, List[Dict]], schema_name: str) -> Dict[str, Any]:
+    def validate_data(
+        self, data: Union[Dict, List[Dict]], schema_name: str
+    ) -> Dict[str, Any]:
         """
         Validate data against schema.
 
@@ -106,12 +108,7 @@ class SchemaValidator:
             raise ValidationError(f"Schema '{schema_name}' not found")
 
         schema = self.schemas[schema_name]
-        result = {
-            "valid": True,
-            "errors": [],
-            "warnings": [],
-            "validated_count": 0
-        }
+        result = {"valid": True, "errors": [], "warnings": [], "validated_count": 0}
 
         if isinstance(data, dict):
             data = [data]
@@ -120,13 +117,17 @@ class SchemaValidator:
             record_errors = self._validate_record(record, schema)
             if record_errors:
                 result["valid"] = False
-                result["errors"].extend([f"Record {i}: {error}" for error in record_errors])
+                result["errors"].extend(
+                    [f"Record {i}: {error}" for error in record_errors]
+                )
             else:
                 result["validated_count"] += 1
 
         return result
 
-    def _validate_record(self, record: Dict[str, Any], schema: Dict[str, Any]) -> List[str]:
+    def _validate_record(
+        self, record: Dict[str, Any], schema: Dict[str, Any]
+    ) -> List[str]:
         """Validate a single record against schema."""
         errors = []
 
@@ -146,7 +147,9 @@ class SchemaValidator:
 
         return errors
 
-    def _validate_field(self, value: Any, field_schema: Dict[str, Any], field_name: str) -> List[str]:
+    def _validate_field(
+        self, value: Any, field_schema: Dict[str, Any], field_name: str
+    ) -> List[str]:
         """Validate a single field against its schema."""
         errors = []
 
@@ -189,7 +192,7 @@ class SchemaValidator:
             "number": (int, float, Decimal),
             "boolean": bool,
             "array": list,
-            "object": dict
+            "object": dict,
         }
 
         expected_python_type = type_mapping.get(expected_type)
@@ -198,7 +201,9 @@ class SchemaValidator:
 
         return False
 
-    def _validate_string(self, value: str, field_schema: Dict[str, Any], field_name: str) -> List[str]:
+    def _validate_string(
+        self, value: str, field_schema: Dict[str, Any], field_name: str
+    ) -> List[str]:
         """Validate string field."""
         errors = []
 
@@ -207,10 +212,14 @@ class SchemaValidator:
         max_length = field_schema.get("maxLength")
 
         if min_length is not None and len(value) < min_length:
-            errors.append(f"Field '{field_name}' must be at least {min_length} characters")
+            errors.append(
+                f"Field '{field_name}' must be at least {min_length} characters"
+            )
 
         if max_length is not None and len(value) > max_length:
-            errors.append(f"Field '{field_name}' must be at most {max_length} characters")
+            errors.append(
+                f"Field '{field_name}' must be at most {max_length} characters"
+            )
 
         # Pattern validation
         pattern = field_schema.get("pattern")
@@ -224,7 +233,12 @@ class SchemaValidator:
 
         return errors
 
-    def _validate_number(self, value: Union[int, float, Decimal], field_schema: Dict[str, Any], field_name: str) -> List[str]:
+    def _validate_number(
+        self,
+        value: Union[int, float, Decimal],
+        field_schema: Dict[str, Any],
+        field_name: str,
+    ) -> List[str]:
         """Validate number field."""
         errors = []
 
@@ -240,7 +254,9 @@ class SchemaValidator:
 
         return errors
 
-    def _validate_array(self, value: List[Any], field_schema: Dict[str, Any], field_name: str) -> List[str]:
+    def _validate_array(
+        self, value: List[Any], field_schema: Dict[str, Any], field_name: str
+    ) -> List[str]:
         """Validate array field."""
         errors = []
 
@@ -258,12 +274,16 @@ class SchemaValidator:
         items_schema = field_schema.get("items")
         if items_schema:
             for i, item in enumerate(value):
-                item_errors = self._validate_field(item, items_schema, f"{field_name}[{i}]")
+                item_errors = self._validate_field(
+                    item, items_schema, f"{field_name}[{i}]"
+                )
                 errors.extend(item_errors)
 
         return errors
 
-    def _validate_object(self, value: Dict[str, Any], field_schema: Dict[str, Any], field_name: str) -> List[str]:
+    def _validate_object(
+        self, value: Dict[str, Any], field_schema: Dict[str, Any], field_name: str
+    ) -> List[str]:
         """Validate object field."""
         errors = []
 
@@ -271,7 +291,9 @@ class SchemaValidator:
         properties = field_schema.get("properties", {})
         for prop_name, prop_schema in properties.items():
             if prop_name in value:
-                prop_errors = self._validate_field(value[prop_name], prop_schema, f"{field_name}.{prop_name}")
+                prop_errors = self._validate_field(
+                    value[prop_name], prop_schema, f"{field_name}.{prop_name}"
+                )
                 errors.extend(prop_errors)
 
         return errors
@@ -283,7 +305,7 @@ def validate_email(value: Any) -> None:
     if value is None:
         return
 
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     if not re.match(email_pattern, str(value)):
         raise ValidationError("Invalid email format", value=value)
 
@@ -293,7 +315,7 @@ def validate_phone(value: Any) -> None:
     if value is None:
         return
 
-    phone_pattern = r'^\+?[\d\s\-\(\)]{10,}$'
+    phone_pattern = r"^\+?[\d\s\-\(\)]{10,}$"
     if not re.match(phone_pattern, str(value)):
         raise ValidationError("Invalid phone number format", value=value)
 
@@ -305,9 +327,11 @@ def validate_date(value: Any) -> None:
 
     if isinstance(value, str):
         try:
-            datetime.strptime(value, '%Y-%m-%d')
+            datetime.strptime(value, "%Y-%m-%d")
         except ValueError:
-            raise ValidationError("Invalid date format. Expected YYYY-MM-DD", value=value)
+            raise ValidationError(
+                "Invalid date format. Expected YYYY-MM-DD", value=value
+            )
     elif not isinstance(value, (date, datetime)):
         raise ValidationError("Value must be a date or datetime", value=value)
 

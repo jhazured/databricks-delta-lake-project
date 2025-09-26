@@ -13,6 +13,7 @@ from enum import Enum
 
 class Environment(Enum):
     """Environment types."""
+
     LOCAL = "local"
     DEV = "dev"
     STAGING = "staging"
@@ -23,6 +24,7 @@ class Environment(Enum):
 @dataclass
 class DatabaseConfig:
     """Database configuration."""
+
     host: str
     port: int
     database: str
@@ -35,6 +37,7 @@ class DatabaseConfig:
 @dataclass
 class DatabricksConfig:
     """Databricks configuration."""
+
     host: str
     token: str
     cluster_id: Optional[str] = None
@@ -46,6 +49,7 @@ class DatabricksConfig:
 @dataclass
 class MonitoringConfig:
     """Monitoring configuration."""
+
     enabled: bool = True
     metrics_endpoint: str = "http://localhost:9090"
     logs_endpoint: str = "http://localhost:9200"
@@ -56,6 +60,7 @@ class MonitoringConfig:
 @dataclass
 class SecurityConfig:
     """Security configuration."""
+
     encryption_enabled: bool = True
     audit_logging: bool = True
     access_control: bool = True
@@ -65,6 +70,7 @@ class SecurityConfig:
 @dataclass
 class AppConfig:
     """Main application configuration."""
+
     environment: Environment
     database: DatabaseConfig
     databricks: DatabricksConfig
@@ -126,13 +132,15 @@ class ConfigManager:
         if not os.path.exists(self.config_path):
             raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
 
-        with open(self.config_path, 'r') as f:
-            if self.config_path.endswith('.yaml') or self.config_path.endswith('.yml'):
+        with open(self.config_path, "r") as f:
+            if self.config_path.endswith(".yaml") or self.config_path.endswith(".yml"):
                 return yaml.safe_load(f)
-            elif self.config_path.endswith('.json'):
+            elif self.config_path.endswith(".json"):
                 return json.load(f)
             else:
-                raise ValueError(f"Unsupported configuration file format: {self.config_path}")
+                raise ValueError(
+                    f"Unsupported configuration file format: {self.config_path}"
+                )
 
     def _override_with_env(self, config_data: Dict[str, Any]) -> Dict[str, Any]:
         """Override configuration with environment variables."""
@@ -166,8 +174,8 @@ class ConfigManager:
 
         # Convert string values to appropriate types
         if isinstance(value, str):
-            if value.lower() in ('true', 'false'):
-                value = value.lower() == 'true'
+            if value.lower() in ("true", "false"):
+                value = value.lower() == "true"
             elif value.isdigit():
                 value = int(value)
 
@@ -186,7 +194,7 @@ class ConfigManager:
             port=db_data.get("port", 5432),
             database=db_data.get("database", "delta_lake"),
             username=db_data.get("username", "user"),
-            password=db_data.get("password", "password")
+            password=db_data.get("password", "password"),
         )
 
         # Create Databricks config
@@ -196,7 +204,7 @@ class ConfigManager:
             token=dbx_data.get("token", ""),
             cluster_id=dbx_data.get("cluster_id"),
             catalog=dbx_data.get("catalog", "main"),
-            schema=dbx_data.get("schema", "default")
+            schema=dbx_data.get("schema", "default"),
         )
 
         # Create monitoring config
@@ -206,7 +214,7 @@ class ConfigManager:
             metrics_endpoint=mon_data.get("metrics_endpoint", "http://localhost:9090"),
             logs_endpoint=mon_data.get("logs_endpoint", "http://localhost:9200"),
             alerting_enabled=mon_data.get("alerting_enabled", True),
-            retention_days=mon_data.get("retention_days", 30)
+            retention_days=mon_data.get("retention_days", 30),
         )
 
         # Create security config
@@ -215,7 +223,7 @@ class ConfigManager:
             encryption_enabled=sec_data.get("encryption_enabled", True),
             audit_logging=sec_data.get("audit_logging", True),
             access_control=sec_data.get("access_control", True),
-            data_classification=sec_data.get("data_classification", True)
+            data_classification=sec_data.get("data_classification", True),
         )
 
         return AppConfig(
@@ -225,7 +233,7 @@ class ConfigManager:
             database=database,
             databricks=databricks,
             monitoring=monitoring,
-            security=security
+            security=security,
         )
 
     def save_config(self, config: AppConfig, path: Optional[str] = None) -> None:
@@ -238,10 +246,10 @@ class ConfigManager:
         """
         save_path = path or self.config_path
 
-        with open(save_path, 'w') as f:
-            if save_path.endswith('.yaml') or save_path.endswith('.yml'):
+        with open(save_path, "w") as f:
+            if save_path.endswith(".yaml") or save_path.endswith(".yml"):
                 yaml.dump(config.to_dict(), f, default_flow_style=False, indent=2)
-            elif save_path.endswith('.json'):
+            elif save_path.endswith(".json"):
                 json.dump(config.to_dict(), f, indent=2)
             else:
                 raise ValueError(f"Unsupported configuration file format: {save_path}")

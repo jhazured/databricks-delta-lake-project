@@ -24,7 +24,7 @@ app = FastAPI(
     description="Enterprise data platform API for Delta Lake operations",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # Add CORS middleware
@@ -36,6 +36,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Pydantic models
 class HealthResponse(BaseModel):
     status: str
@@ -43,10 +44,12 @@ class HealthResponse(BaseModel):
     version: str
     environment: str
 
+
 class DataQueryRequest(BaseModel):
     query: str
     limit: Optional[int] = 100
     parameters: Optional[Dict[str, Any]] = None
+
 
 class DataQueryResponse(BaseModel):
     data: List[Dict[str, Any]]
@@ -54,11 +57,13 @@ class DataQueryResponse(BaseModel):
     execution_time_ms: float
     query: str
 
+
 class ErrorResponse(BaseModel):
     error: str
     message: str
     timestamp: datetime
     request_id: Optional[str] = None
+
 
 # Dependency to get configuration
 def get_app_config():
@@ -69,8 +74,9 @@ def get_app_config():
         logger.error(f"Failed to load configuration: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Configuration error"
+            detail="Configuration error",
         )
+
 
 # Global exception handler
 @app.exception_handler(DeltaLakeError)
@@ -81,7 +87,7 @@ async def delta_lake_error_handler(request, exc: DeltaLakeError):
         error_type=exc.__class__.__name__,
         error_message=exc.message,
         error_code=exc.error_code,
-        details=exc.details
+        details=exc.details,
     )
 
     return JSONResponse(
@@ -89,9 +95,10 @@ async def delta_lake_error_handler(request, exc: DeltaLakeError):
         content=ErrorResponse(
             error=exc.__class__.__name__,
             message=exc.message,
-            timestamp=datetime.utcnow()
-        ).dict()
+            timestamp=datetime.utcnow(),
+        ).dict(),
     )
+
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc: Exception):
@@ -99,7 +106,7 @@ async def general_exception_handler(request, exc: Exception):
     structured_logger.error(
         "Unexpected error occurred",
         error_type=exc.__class__.__name__,
-        error_message=str(exc)
+        error_message=str(exc),
     )
 
     return JSONResponse(
@@ -107,9 +114,10 @@ async def general_exception_handler(request, exc: Exception):
         content=ErrorResponse(
             error="InternalServerError",
             message="An unexpected error occurred",
-            timestamp=datetime.utcnow()
-        ).dict()
+            timestamp=datetime.utcnow(),
+        ).dict(),
     )
+
 
 # Health check endpoints
 @app.get("/health", response_model=HealthResponse)
@@ -119,8 +127,9 @@ async def health_check(config: Dict[str, Any] = Depends(get_app_config)):
         status="healthy",
         timestamp=datetime.utcnow(),
         version="1.0.0",
-        environment=config.get("environment", "unknown")
+        environment=config.get("environment", "unknown"),
     )
+
 
 @app.get("/ready")
 async def readiness_check():
@@ -128,11 +137,11 @@ async def readiness_check():
     # Add actual readiness checks here (database connectivity, etc.)
     return {"status": "ready"}
 
+
 # Data endpoints
 @app.post("/api/v1/data/query", response_model=DataQueryResponse)
 async def query_data(
-    request: DataQueryRequest,
-    config: Dict[str, Any] = Depends(get_app_config)
+    request: DataQueryRequest, config: Dict[str, Any] = Depends(get_app_config)
 ):
     """
     Execute data query.
@@ -142,33 +151,35 @@ async def query_data(
     """
     try:
         structured_logger.info(
-            "Data query requested",
-            query=request.query,
-            limit=request.limit
+            "Data query requested", query=request.query, limit=request.limit
         )
 
         # Mock data response
         mock_data = [
             {"id": 1, "name": "Sample Data 1", "value": 100.0},
             {"id": 2, "name": "Sample Data 2", "value": 200.0},
-            {"id": 3, "name": "Sample Data 3", "value": 300.0}
+            {"id": 3, "name": "Sample Data 3", "value": 300.0},
         ]
 
         # Simulate query execution time
         import time
+
         start_time = time.time()
         time.sleep(0.1)  # Simulate processing time
         execution_time = (time.time() - start_time) * 1000
 
         return DataQueryResponse(
-            data=mock_data[:request.limit],
+            data=mock_data[: request.limit],
             total_rows=len(mock_data),
             execution_time_ms=execution_time,
-            query=request.query
+            query=request.query,
         )
 
     except Exception as e:
-        raise APIError(f"Failed to execute query: {str(e)}", endpoint="/api/v1/data/query")
+        raise APIError(
+            f"Failed to execute query: {str(e)}", endpoint="/api/v1/data/query"
+        )
+
 
 @app.get("/api/v1/data/tables")
 async def list_tables(config: Dict[str, Any] = Depends(get_app_config)):
@@ -177,10 +188,11 @@ async def list_tables(config: Dict[str, Any] = Depends(get_app_config)):
     tables = [
         {"name": "customers", "schema": "bronze", "rows": 1000},
         {"name": "transactions", "schema": "bronze", "rows": 5000},
-        {"name": "customer_summary", "schema": "gold", "rows": 1000}
+        {"name": "customer_summary", "schema": "gold", "rows": 1000},
     ]
 
     return {"tables": tables}
+
 
 @app.get("/api/v1/data/tables/{table_name}/schema")
 async def get_table_schema(table_name: str):
@@ -192,7 +204,7 @@ async def get_table_schema(table_name: str):
                 {"name": "id", "type": "string", "nullable": False},
                 {"name": "name", "type": "string", "nullable": True},
                 {"name": "email", "type": "string", "nullable": True},
-                {"name": "created_at", "type": "timestamp", "nullable": False}
+                {"name": "created_at", "type": "timestamp", "nullable": False},
             ]
         },
         "transactions": {
@@ -200,18 +212,19 @@ async def get_table_schema(table_name: str):
                 {"name": "id", "type": "string", "nullable": False},
                 {"name": "customer_id", "type": "string", "nullable": False},
                 {"name": "amount", "type": "decimal", "nullable": False},
-                {"name": "transaction_date", "type": "timestamp", "nullable": False}
+                {"name": "transaction_date", "type": "timestamp", "nullable": False},
             ]
-        }
+        },
     }
 
     if table_name not in mock_schemas:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Table '{table_name}' not found"
+            detail=f"Table '{table_name}' not found",
         )
 
     return mock_schemas[table_name]
+
 
 # Monitoring endpoints
 @app.get("/api/v1/monitoring/metrics")
@@ -223,10 +236,11 @@ async def get_metrics():
         "memory_usage": 67.8,
         "disk_usage": 23.1,
         "active_connections": 12,
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.utcnow(),
     }
 
     return metrics
+
 
 @app.get("/api/v1/monitoring/health")
 async def get_detailed_health():
@@ -236,12 +250,13 @@ async def get_detailed_health():
         "components": {
             "database": {"status": "healthy", "response_time_ms": 15},
             "databricks": {"status": "healthy", "response_time_ms": 250},
-            "cache": {"status": "healthy", "response_time_ms": 5}
+            "cache": {"status": "healthy", "response_time_ms": 5},
         },
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.utcnow(),
     }
 
     return health_info
+
 
 # ML endpoints
 @app.get("/api/v1/ml/models")
@@ -254,7 +269,7 @@ async def list_models():
             "version": "1.0.0",
             "status": "active",
             "accuracy": 0.87,
-            "created_at": "2024-01-01T00:00:00Z"
+            "created_at": "2024-01-01T00:00:00Z",
         },
         {
             "id": "model_002",
@@ -262,11 +277,12 @@ async def list_models():
             "version": "2.1.0",
             "status": "active",
             "accuracy": 0.94,
-            "created_at": "2024-01-15T00:00:00Z"
-        }
+            "created_at": "2024-01-15T00:00:00Z",
+        },
     ]
 
     return {"models": models}
+
 
 @app.post("/api/v1/ml/models/{model_id}/predict")
 async def predict(model_id: str, data: Dict[str, Any]):
@@ -274,16 +290,17 @@ async def predict(model_id: str, data: Dict[str, Any]):
     # Mock prediction response
     predictions = {
         "model_001": {"prediction": "churn", "confidence": 0.85, "probability": 0.78},
-        "model_002": {"prediction": "fraud", "confidence": 0.92, "probability": 0.91}
+        "model_002": {"prediction": "fraud", "confidence": 0.92, "probability": 0.91},
     }
 
     if model_id not in predictions:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Model '{model_id}' not found"
+            detail=f"Model '{model_id}' not found",
         )
 
     return predictions[model_id]
+
 
 # Startup and shutdown events
 @app.on_event("startup")
@@ -297,10 +314,13 @@ async def startup_event():
         structured_logger.info(
             "Application configuration loaded",
             environment=config.environment.value,
-            debug=config.debug
+            debug=config.debug,
         )
     except Exception as e:
-        structured_logger.error("Failed to load configuration during startup", error=str(e))
+        structured_logger.error(
+            "Failed to load configuration during startup", error=str(e)
+        )
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -309,11 +329,8 @@ async def shutdown_event():
 
     # Cleanup resources, close connections, etc.
 
+
 if __name__ == "__main__":
     uvicorn.run(
-        "api.main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
+        "api.main:app", host="0.0.0.0", port=8000, reload=True, log_level="info"
     )

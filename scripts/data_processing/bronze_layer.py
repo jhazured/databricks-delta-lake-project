@@ -55,7 +55,9 @@ class BronzeLayerProcessor:
             for i, record in enumerate(data):
                 errors = self.validator.validate(record)
                 if errors:
-                    validation_errors.extend([f"Record {i}: {error}" for error in errors.values()])
+                    validation_errors.extend(
+                        [f"Record {i}: {error}" for error in errors.values()]
+                    )
 
             if validation_errors:
                 self.logger.warning(f"Validation errors found: {validation_errors}")
@@ -76,7 +78,7 @@ class BronzeLayerProcessor:
             raise DataProcessingError(
                 f"Failed to process raw data from {source}: {str(e)}",
                 stage="bronze_layer",
-                data_source=source
+                data_source=source,
             )
 
     def _add_bronze_metadata(self, df: pd.DataFrame, source: str) -> pd.DataFrame:
@@ -91,10 +93,10 @@ class BronzeLayerProcessor:
             DataFrame with bronze layer metadata
         """
         # Add processing metadata
-        df['_bronze_ingestion_timestamp'] = datetime.utcnow()
-        df['_bronze_source'] = source
-        df['_bronze_batch_id'] = self._generate_batch_id()
-        df['_bronze_record_count'] = len(df)
+        df["_bronze_ingestion_timestamp"] = datetime.utcnow()
+        df["_bronze_source"] = source
+        df["_bronze_batch_id"] = self._generate_batch_id()
+        df["_bronze_record_count"] = len(df)
 
         return df
 
@@ -117,17 +119,21 @@ class BronzeLayerProcessor:
             "total_columns": len(df.columns),
             "null_counts": df.isnull().sum().to_dict(),
             "duplicate_count": df.duplicated().sum(),
-            "memory_usage_mb": df.memory_usage(deep=True).sum() / 1024 / 1024
+            "memory_usage_mb": df.memory_usage(deep=True).sum() / 1024 / 1024,
         }
 
         # Calculate completeness percentage
         total_cells = len(df) * len(df.columns)
         null_cells = df.isnull().sum().sum()
-        metrics["completeness_percentage"] = ((total_cells - null_cells) / total_cells) * 100
+        metrics["completeness_percentage"] = (
+            (total_cells - null_cells) / total_cells
+        ) * 100
 
         return metrics
 
-    def save_bronze_data(self, df: pd.DataFrame, table_name: str, output_path: str) -> str:
+    def save_bronze_data(
+        self, df: pd.DataFrame, table_name: str, output_path: str
+    ) -> str:
         """
         Save bronze layer data to storage.
 
@@ -154,7 +160,7 @@ class BronzeLayerProcessor:
             raise DataProcessingError(
                 f"Failed to save bronze data: {str(e)}",
                 stage="bronze_save",
-                data_source=table_name
+                data_source=table_name,
             )
 
     def load_bronze_data(self, file_path: str) -> pd.DataFrame:
@@ -176,7 +182,7 @@ class BronzeLayerProcessor:
             raise DataProcessingError(
                 f"Failed to load bronze data: {str(e)}",
                 stage="bronze_load",
-                data_source=file_path
+                data_source=file_path,
             )
 
 
@@ -205,9 +211,11 @@ class SampleDataGenerator:
                 "email": f"customer{i}@example.com",
                 "phone": f"+1-{random.randint(100, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}",
                 "address": f"{random.randint(1, 9999)} Main St, City {i % 100}",
-                "registration_date": (datetime.now() - timedelta(days=random.randint(1, 365))).strftime("%Y-%m-%d"),
+                "registration_date": (
+                    datetime.now() - timedelta(days=random.randint(1, 365))
+                ).strftime("%Y-%m-%d"),
                 "status": random.choice(["active", "inactive", "pending"]),
-                "source": "sample_generator"
+                "source": "sample_generator",
             }
             data.append(record)
 
@@ -234,10 +242,14 @@ class SampleDataGenerator:
                 "customer_id": f"cust_{random.randint(0, 999):06d}",
                 "amount": round(random.uniform(10.0, 1000.0), 2),
                 "currency": random.choice(["USD", "EUR", "GBP"]),
-                "transaction_date": (datetime.now() - timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d %H:%M:%S"),
-                "category": random.choice(["food", "transport", "entertainment", "shopping", "utilities"]),
+                "transaction_date": (
+                    datetime.now() - timedelta(days=random.randint(1, 30))
+                ).strftime("%Y-%m-%d %H:%M:%S"),
+                "category": random.choice(
+                    ["food", "transport", "entertainment", "shopping", "utilities"]
+                ),
                 "status": random.choice(["completed", "pending", "failed"]),
-                "source": "sample_generator"
+                "source": "sample_generator",
             }
             data.append(record)
 
@@ -262,9 +274,7 @@ def main():
 
     # Save customer data
     customer_path = processor.save_bronze_data(
-        customer_df,
-        "customers",
-        "data/bronze/customers"
+        customer_df, "customers", "data/bronze/customers"
     )
 
     # Process transaction data
@@ -274,9 +284,7 @@ def main():
 
     # Save transaction data
     transaction_path = processor.save_bronze_data(
-        transaction_df,
-        "transactions",
-        "data/bronze/transactions"
+        transaction_df, "transactions", "data/bronze/transactions"
     )
 
     logger.info(f"Bronze layer processing completed. Files saved to:")

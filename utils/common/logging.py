@@ -107,7 +107,7 @@ class StructuredLogger:
             "timestamp": datetime.utcnow().isoformat(),
             "level": logging.getLevelName(level),
             "message": message,
-            **kwargs
+            **kwargs,
         }
         self.logger.log(level, json.dumps(log_data))
 
@@ -126,7 +126,7 @@ class JsonFormatter(logging.Formatter):
             "message": record.getMessage(),
             "module": record.module,
             "function": record.funcName,
-            "line": record.lineno
+            "line": record.lineno,
         }
 
         # Add exception info if present
@@ -144,6 +144,7 @@ def log_performance(logger: logging.Logger):
     Args:
         logger: Logger instance to use
     """
+
     def decorator(func):
         def wrapper(*args, **kwargs):
             start_time = datetime.utcnow()
@@ -160,4 +161,5 @@ def log_performance(logger: logging.Logger):
                 raise
 
         return wrapper
+
     return decorator
