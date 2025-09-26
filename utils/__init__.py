@@ -19,12 +19,12 @@ from .common.logging import setup_logging
 from .common.validation import (
     DataValidator,
     SchemaValidator,
-    validate_email,
-    validate_phone,
     validate_date,
-    validate_positive_number,
-    validate_not_empty,
+    validate_email,
     validate_json,
+    validate_not_empty,
+    validate_phone,
+    validate_positive_number,
 )
 
 # Databricks utilities

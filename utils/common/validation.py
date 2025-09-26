@@ -110,7 +110,12 @@ class SchemaValidator:
             raise ValidationError(f"Schema '{schema_name}' not found")
 
         schema = self.schemas[schema_name]
-        result: Dict[str, Any] = {"valid": True, "errors": [], "warnings": [], "validated_count": 0}
+        result: Dict[str, Any] = {
+            "valid": True,
+            "errors": [],
+            "warnings": [],
+            "validated_count": 0,
+        }
 
         data_list: List[Dict[str, Any]]
         if isinstance(data, dict):
