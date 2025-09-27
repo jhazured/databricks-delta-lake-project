@@ -739,14 +739,14 @@ class DataEnrichmentProcessor:
 
                     # Add time since creation
                     if column == "created_at":
-                        now = datetime.now(timezone.utc)
+                        now = pd.Timestamp.now(tz="UTC")
                         # Ensure dates are timezone-aware
                         if dates.dt.tz is None:
                             dates = dates.dt.tz_localize("UTC")
                         else:
                             dates = dates.dt.tz_convert("UTC")
-                        # Calculate time difference with proper typing
-                        time_diff = now - dates  # type: ignore[operator]
+                        # Calculate time difference using pandas operations
+                        time_diff = now - dates
                         enriched_df["days_since_creation"] = time_diff.dt.days
 
                 except Exception as e:

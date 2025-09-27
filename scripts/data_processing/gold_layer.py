@@ -428,18 +428,27 @@ class AggregationProcessor:
     ) -> pd.Series:
         """Create time-based grouping for aggregation."""
         if aggregation_level == AggregationLevel.DAILY:
-            return date_series.dt.date
+            return pd.Series(date_series.dt.date, index=date_series.index)
         elif aggregation_level == AggregationLevel.WEEKLY:
-            return date_series.dt.to_period("W").dt.start_time.dt.date
+            return pd.Series(
+                date_series.dt.to_period("W").dt.start_time.dt.date,
+                index=date_series.index,
+            )
         elif aggregation_level == AggregationLevel.MONTHLY:
-            return date_series.dt.to_period("M").dt.start_time.dt.date
+            return pd.Series(
+                date_series.dt.to_period("M").dt.start_time.dt.date,
+                index=date_series.index,
+            )
         elif aggregation_level == AggregationLevel.QUARTERLY:
-            return date_series.dt.to_period("Q").dt.start_time.dt.date
-        elif aggregation_level == AggregationLevel.YEARLY:
-            return date_series.dt.to_period("Y").dt.start_time.dt.date
-        else:
-            # This should never be reached due to enum coverage
-            return date_series.dt.date  # type: ignore[unreachable]
+            return pd.Series(
+                date_series.dt.to_period("Q").dt.start_time.dt.date,
+                index=date_series.index,
+            )
+        else:  # AggregationLevel.YEARLY
+            return pd.Series(
+                date_series.dt.to_period("Y").dt.start_time.dt.date,
+                index=date_series.index,
+            )
 
     def _simple_aggregation(
         self, df: pd.DataFrame, group_by_columns: Optional[List[str]] = None
@@ -664,14 +673,14 @@ class MLFeatureProcessor:
                     )
 
                     # Time since features
-                    now = datetime.now(timezone.utc)
+                    now = pd.Timestamp.now(tz="UTC")
                     # Ensure dates are timezone-aware
                     if dates.dt.tz is None:
                         dates = dates.dt.tz_localize("UTC")
                     else:
                         dates = dates.dt.tz_convert("UTC")
-                    # Calculate time differences with proper typing
-                    time_diff = now - dates  # type: ignore[operator]
+                    # Calculate time differences using pandas operations
+                    time_diff = now - dates
                     features_df[f"{col}_days_since"] = time_diff.dt.days
                     features_df[f"{col}_hours_since"] = (
                         time_diff.dt.total_seconds() / 3600
