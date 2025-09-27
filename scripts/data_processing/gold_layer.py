@@ -428,27 +428,18 @@ class AggregationProcessor:
     ) -> pd.Series:
         """Create time-based grouping for aggregation."""
         if aggregation_level == AggregationLevel.DAILY:
-            return pd.Series(date_series.dt.date, index=date_series.index)
+            result = date_series.dt.date
         elif aggregation_level == AggregationLevel.WEEKLY:
-            return pd.Series(
-                date_series.dt.to_period("W").dt.start_time.dt.date,
-                index=date_series.index,
-            )
+            result = date_series.dt.to_period("W").dt.start_time.dt.date
         elif aggregation_level == AggregationLevel.MONTHLY:
-            return pd.Series(
-                date_series.dt.to_period("M").dt.start_time.dt.date,
-                index=date_series.index,
-            )
+            result = date_series.dt.to_period("M").dt.start_time.dt.date
         elif aggregation_level == AggregationLevel.QUARTERLY:
-            return pd.Series(
-                date_series.dt.to_period("Q").dt.start_time.dt.date,
-                index=date_series.index,
-            )
+            result = date_series.dt.to_period("Q").dt.start_time.dt.date
         else:  # AggregationLevel.YEARLY
-            return pd.Series(
-                date_series.dt.to_period("Y").dt.start_time.dt.date,
-                index=date_series.index,
-            )
+            result = date_series.dt.to_period("Y").dt.start_time.dt.date
+
+        # Convert to Series with proper typing
+        return pd.Series(result, index=date_series.index, dtype="object")
 
     def _simple_aggregation(
         self, df: pd.DataFrame, group_by_columns: Optional[List[str]] = None
