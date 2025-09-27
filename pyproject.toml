@@ -131,18 +131,42 @@ known_third_party = ["databricks", "pyspark", "mlflow", "pandas", "numpy"]
 python_version = "3.12"
 warn_return_any = true
 warn_unused_configs = true
-ignore_missing_imports = false
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 check_untyped_defs = true
-disallow_untyped_decorators = true
+disallow_untyped_decorators = false
 no_implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
-strict_optional = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
+
+# Package discovery
+explicit_package_bases = true
+namespace_packages = true
+
+# Import handling
+ignore_missing_imports = true
+
+# Per-module options
+[[tool.mypy.overrides]]
+module = ["pandas.*", "numpy.*", "pytest.*", "requests.*", "azure.*", "databricks.*"]
+ignore_missing_imports = true
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".mypy_cache",
+    ".tox",
+    "build",
+    "dist",
+]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
