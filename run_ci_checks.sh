@@ -22,7 +22,7 @@ echo "📋 5. Type checking (mypy)"
 python -m mypy utils/ scripts/ api/
 
 echo "📋 6. Code analysis (pylint)"
-python -m pylint utils/ scripts/ api/ --disable=C0114,C0116,C0302,W1203,C0103,W0707,C0209,W0718,R0903,R1705,R0902,R0914,W1514,W0612,R0801 --score=y --fail-under=7.0
+python -m pylint utils/ scripts/ api/ --disable=C0114,C0116,W1203,C0103,W0707,C0209,W0718,R0903,R1705,R0902,R0914,W1514,W0612,R0801 --score=y --fail-under=8.0
 
 echo "📋 7. Documentation style (pydocstyle)"
 python -m pydocstyle utils/ scripts/ api/ --count
@@ -31,6 +31,6 @@ echo "📋 8. Dead code detection (vulture)"
 python -m vulture utils/ scripts/ api/ --min-confidence 70 --exclude api/main.py
 
 echo "📋 9. Code complexity (radon)"
-python -m radon cc utils/ scripts/ api/ --min C --show-complexity
+python -m radon cc utils/ scripts/ api/ --min B --show-complexity
 
 echo "✅ All CI checks completed!"

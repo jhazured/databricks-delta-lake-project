@@ -432,19 +432,31 @@ class MedallionPipeline:
         """Save pipeline results to files."""
         output_dir = Path(self.config.get("output_directory", "output"))
         output_dir.mkdir(parents=True, exist_ok=True)
-
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
-        # Save bronze data
+        self._save_bronze_data(bronze_data, output_dir, timestamp)
+        self._save_silver_data(silver_results, output_dir, timestamp)
+        self._save_gold_data(gold_results, output_dir, timestamp)
+        self._save_pipeline_summary(gold_results, output_dir, timestamp)
+
+        self.logger.info("Pipeline results saved to: %s", output_dir)
+
+    def _save_bronze_data(
+        self, bronze_data: Dict[str, pd.DataFrame], output_dir: Path, timestamp: str
+    ) -> None:
+        """Save bronze data to files."""
         bronze_dir = output_dir / "bronze" / timestamp
         bronze_dir.mkdir(parents=True, exist_ok=True)
 
         for table_name, df in bronze_data.items():
             file_path = bronze_dir / f"{table_name}.parquet"
             df.to_parquet(file_path, index=False)
-            self.logger.info(f"Saved bronze data: {file_path}")
+            self.logger.info("Saved bronze data: %s", file_path)
 
-        # Save silver data
+    def _save_silver_data(
+        self, silver_results: Dict[str, Any], output_dir: Path, timestamp: str
+    ) -> None:
+        """Save silver data to files."""
         silver_dir = output_dir / "silver" / timestamp
         silver_dir.mkdir(parents=True, exist_ok=True)
 
@@ -452,45 +464,60 @@ class MedallionPipeline:
             if "silver_data" in result and not result["silver_data"].empty:
                 file_path = silver_dir / f"{table_name}.parquet"
                 result["silver_data"].to_parquet(file_path, index=False)
-                self.logger.info(f"Saved silver data: {file_path}")
+                self.logger.info("Saved silver data: %s", file_path)
 
-        # Save gold data
+    def _save_gold_data(
+        self, gold_results: Dict[str, Any], output_dir: Path, timestamp: str
+    ) -> None:
+        """Save gold data to files."""
         gold_dir = output_dir / "gold" / timestamp
         gold_dir.mkdir(parents=True, exist_ok=True)
 
-        if "gold_data" in gold_results:
-            for table_name, result in gold_results["gold_data"].items():
-                table_dir = gold_dir / table_name
-                table_dir.mkdir(exist_ok=True)
+        if "gold_data" not in gold_results:
+            return
 
-                # Save aggregated data
-                if "aggregated_data" in result:
-                    file_path = table_dir / "aggregated_data.parquet"
-                    result["aggregated_data"].to_parquet(file_path, index=False)
+        for table_name, result in gold_results["gold_data"].items():
+            table_dir = gold_dir / table_name
+            table_dir.mkdir(exist_ok=True)
+            self._save_gold_table_data(result, table_dir)
 
-                # Save ML features
-                if "ml_features" in result:
-                    file_path = table_dir / "ml_features.parquet"
-                    result["ml_features"].to_parquet(file_path, index=False)
+    def _save_gold_table_data(self, result: Dict[str, Any], table_dir: Path) -> None:
+        """Save individual gold table data."""
+        # Save aggregated data
+        if "aggregated_data" in result:
+            file_path = table_dir / "aggregated_data.parquet"
+            result["aggregated_data"].to_parquet(file_path, index=False)
 
-                # Save reporting data
-                if "reporting_data" in result:
-                    reporting_dir = table_dir / "reporting"
-                    reporting_dir.mkdir(exist_ok=True)
+        # Save ML features
+        if "ml_features" in result:
+            file_path = table_dir / "ml_features.parquet"
+            result["ml_features"].to_parquet(file_path, index=False)
 
-                    for report_type, report_df in result["reporting_data"].items():
-                        if not report_df.empty:
-                            file_path = reporting_dir / f"{report_type}.parquet"
-                            report_df.to_parquet(file_path, index=False)
+        # Save reporting data
+        if "reporting_data" in result:
+            self._save_reporting_data(result["reporting_data"], table_dir)
 
-        # Save pipeline summary
+    def _save_reporting_data(
+        self, reporting_data: Dict[str, pd.DataFrame], table_dir: Path
+    ) -> None:
+        """Save reporting data to files."""
+        reporting_dir = table_dir / "reporting"
+        reporting_dir.mkdir(exist_ok=True)
+
+        for report_type, report_df in reporting_data.items():
+            if not report_df.empty:
+                file_path = reporting_dir / f"{report_type}.parquet"
+                report_df.to_parquet(file_path, index=False)
+
+    def _save_pipeline_summary(
+        self, gold_results: Dict[str, Any], output_dir: Path, timestamp: str
+    ) -> None:
+        """Save pipeline summary to file."""
         summary_file = output_dir / f"pipeline_summary_{timestamp}.json"
-        with open(summary_file, "w") as f:
+        with open(summary_file, "w", encoding="utf-8") as f:
             json.dump(
                 gold_results.get("pipeline_summary", {}), f, indent=2, default=str
             )
-
-        self.logger.info(f"Pipeline results saved to: {output_dir}")
 
 
 def main() -> None:
