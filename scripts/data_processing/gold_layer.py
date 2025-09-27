@@ -81,14 +81,21 @@ class BusinessMetricsProcessor:
         self.business_rules = {
             "revenue_columns": ["amount", "price", "total", "revenue"],
             "customer_id_columns": ["customer_id", "user_id", "id"],
-            "date_columns": ["created_at", "updated_at", "transaction_date", "order_date"],
+            "date_columns": [
+                "created_at",
+                "updated_at",
+                "transaction_date",
+                "order_date",
+            ],
             "status_columns": ["status", "order_status", "payment_status"],
         }
 
         # Update with custom rules
         self.business_rules.update(self.config.get("business_rules", {}))
 
-    def calculate_business_metrics(self, df: pd.DataFrame, table_name: str) -> List[BusinessMetric]:
+    def calculate_business_metrics(
+        self, df: pd.DataFrame, table_name: str
+    ) -> List[BusinessMetric]:
         """Calculate business metrics from silver layer data.
 
         Args:
@@ -110,14 +117,22 @@ class BusinessMetricsProcessor:
             metrics.extend(self._calculate_retention_metrics(df, table_name))
             metrics.extend(self._calculate_churn_metrics(df, table_name))
 
-            self.logger.info(f"Calculated {len(metrics)} business metrics for {table_name}")
+            self.logger.info(
+                f"Calculated {len(metrics)} business metrics for {table_name}"
+            )
             return metrics
 
         except Exception as e:
-            self.logger.error("Business metrics calculation failed for %s: %s", table_name, str(e))
-            raise DataProcessingError("Business metrics calculation failed: %s" % str(e))
+            self.logger.error(
+                "Business metrics calculation failed for %s: %s", table_name, str(e)
+            )
+            raise DataProcessingError(
+                "Business metrics calculation failed: %s" % str(e)
+            )
 
-    def _calculate_revenue_metrics(self, df: pd.DataFrame, table_name: str) -> List[BusinessMetric]:
+    def _calculate_revenue_metrics(
+        self, df: pd.DataFrame, table_name: str
+    ) -> List[BusinessMetric]:
         """Calculate revenue-related metrics."""
         metrics = []
 
@@ -151,12 +166,16 @@ class BusinessMetricsProcessor:
 
         return metrics
 
-    def _calculate_customer_metrics(self, df: pd.DataFrame, table_name: str) -> List[BusinessMetric]:
+    def _calculate_customer_metrics(
+        self, df: pd.DataFrame, table_name: str
+    ) -> List[BusinessMetric]:
         """Calculate customer-related metrics."""
         metrics = []
 
         # Find customer ID column
-        customer_id_column = self._find_column(df, self.business_rules["customer_id_columns"])
+        customer_id_column = self._find_column(
+            df, self.business_rules["customer_id_columns"]
+        )
 
         if customer_id_column:
             # Total customer count
@@ -172,7 +191,9 @@ class BusinessMetricsProcessor:
             )
 
             # Customer lifetime value (if revenue data available)
-            revenue_column = self._find_column(df, self.business_rules["revenue_columns"])
+            revenue_column = self._find_column(
+                df, self.business_rules["revenue_columns"]
+            )
             if revenue_column:
                 customer_revenue = df.groupby(customer_id_column)[revenue_column].sum()
                 avg_clv = customer_revenue.mean()
@@ -188,7 +209,9 @@ class BusinessMetricsProcessor:
 
         return metrics
 
-    def _calculate_conversion_metrics(self, df: pd.DataFrame, table_name: str) -> List[BusinessMetric]:
+    def _calculate_conversion_metrics(
+        self, df: pd.DataFrame, table_name: str
+    ) -> List[BusinessMetric]:
         """Calculate conversion-related metrics."""
         metrics = []
 
@@ -198,7 +221,9 @@ class BusinessMetricsProcessor:
         if status_column:
             # Calculate conversion rate based on status
             total_records = len(df)
-            successful_records = df[df[status_column].isin(["completed", "success", "active", "A"])].shape[0]
+            successful_records = df[
+                df[status_column].isin(["completed", "success", "active", "A"])
+            ].shape[0]
 
             if total_records > 0:
                 conversion_rate = (successful_records / total_records) * 100
@@ -214,13 +239,17 @@ class BusinessMetricsProcessor:
 
         return metrics
 
-    def _calculate_retention_metrics(self, df: pd.DataFrame, table_name: str) -> List[BusinessMetric]:
+    def _calculate_retention_metrics(
+        self, df: pd.DataFrame, table_name: str
+    ) -> List[BusinessMetric]:
         """Calculate retention-related metrics."""
         metrics = []
 
         # Find date and customer ID columns
         date_column = self._find_column(df, self.business_rules["date_columns"])
-        customer_id_column = self._find_column(df, self.business_rules["customer_id_columns"])
+        customer_id_column = self._find_column(
+            df, self.business_rules["customer_id_columns"]
+        )
 
         if date_column and customer_id_column:
             try:
@@ -232,7 +261,9 @@ class BusinessMetricsProcessor:
                 current_date = datetime.now(timezone.utc)
                 thirty_days_ago = current_date - timedelta(days=30)
 
-                recent_customers = df[df[date_column] >= thirty_days_ago][customer_id_column].nunique()
+                recent_customers = df[df[date_column] >= thirty_days_ago][
+                    customer_id_column
+                ].nunique()
                 total_customers = df[customer_id_column].nunique()
 
                 if total_customers > 0:
@@ -251,13 +282,17 @@ class BusinessMetricsProcessor:
 
         return metrics
 
-    def _calculate_churn_metrics(self, df: pd.DataFrame, table_name: str) -> List[BusinessMetric]:
+    def _calculate_churn_metrics(
+        self, df: pd.DataFrame, table_name: str
+    ) -> List[BusinessMetric]:
         """Calculate churn-related metrics."""
         metrics = []
 
         # Find date and customer ID columns
         date_column = self._find_column(df, self.business_rules["date_columns"])
-        customer_id_column = self._find_column(df, self.business_rules["customer_id_columns"])
+        customer_id_column = self._find_column(
+            df, self.business_rules["customer_id_columns"]
+        )
 
         if date_column and customer_id_column:
             try:
@@ -268,11 +303,15 @@ class BusinessMetricsProcessor:
                 current_date = datetime.now(timezone.utc)
                 thirty_days_ago = current_date - timedelta(days=30)
 
-                active_customers = df[df[date_column] >= thirty_days_ago][customer_id_column].nunique()
+                active_customers = df[df[date_column] >= thirty_days_ago][
+                    customer_id_column
+                ].nunique()
                 total_customers = df[customer_id_column].nunique()
 
                 if total_customers > 0:
-                    churn_rate = ((total_customers - active_customers) / total_customers) * 100
+                    churn_rate = (
+                        (total_customers - active_customers) / total_customers
+                    ) * 100
                     metrics.append(
                         BusinessMetric(
                             metric_type=BusinessMetricType.CHURN_RATE,
@@ -287,7 +326,9 @@ class BusinessMetricsProcessor:
 
         return metrics
 
-    def _find_column(self, df: pd.DataFrame, possible_names: List[str]) -> Optional[str]:
+    def _find_column(
+        self, df: pd.DataFrame, possible_names: List[str]
+    ) -> Optional[str]:
         """Find a column by trying multiple possible names."""
         for name in possible_names:
             if name in df.columns:
@@ -308,7 +349,10 @@ class AggregationProcessor:
         self.logger = logging.getLogger(__name__)
 
     def aggregate_data(
-        self, df: pd.DataFrame, aggregation_level: AggregationLevel, group_by_columns: List[str] = None
+        self,
+        df: pd.DataFrame,
+        aggregation_level: AggregationLevel,
+        group_by_columns: List[str] = None,
     ) -> pd.DataFrame:
         """Aggregate data based on specified level and grouping.
 
@@ -321,13 +365,17 @@ class AggregationProcessor:
             Aggregated dataframe
         """
         try:
-            self.logger.info(f"Starting data aggregation at {aggregation_level.value} level")
+            self.logger.info(
+                f"Starting data aggregation at {aggregation_level.value} level"
+            )
 
             # Find date column for time-based aggregation
             date_column = self._find_date_column(df)
 
             if date_column is None:
-                self.logger.warning("No date column found, performing simple aggregation")
+                self.logger.warning(
+                    "No date column found, performing simple aggregation"
+                )
                 return self._simple_aggregation(df, group_by_columns)
 
             # Convert date column to datetime
@@ -345,7 +393,9 @@ class AggregationProcessor:
             # Perform aggregation
             aggregated_df = self._perform_aggregation(df, group_columns)
 
-            self.logger.info(f"Data aggregation completed: {len(df)} -> {len(aggregated_df)} records")
+            self.logger.info(
+                f"Data aggregation completed: {len(df)} -> {len(aggregated_df)} records"
+            )
             return aggregated_df
 
         except Exception as e:
@@ -354,7 +404,13 @@ class AggregationProcessor:
 
     def _find_date_column(self, df: pd.DataFrame) -> Optional[str]:
         """Find the primary date column in the dataframe."""
-        date_columns = ["created_at", "updated_at", "transaction_date", "order_date", "date"]
+        date_columns = [
+            "created_at",
+            "updated_at",
+            "transaction_date",
+            "order_date",
+            "date",
+        ]
 
         for column in date_columns:
             if column in df.columns:
@@ -367,7 +423,9 @@ class AggregationProcessor:
 
         return None
 
-    def _create_time_group(self, date_series: pd.Series, aggregation_level: AggregationLevel) -> pd.Series:
+    def _create_time_group(
+        self, date_series: pd.Series, aggregation_level: AggregationLevel
+    ) -> pd.Series:
         """Create time-based grouping for aggregation."""
         if aggregation_level == AggregationLevel.DAILY:
             return date_series.dt.date
@@ -382,7 +440,9 @@ class AggregationProcessor:
         else:
             return date_series.dt.date
 
-    def _simple_aggregation(self, df: pd.DataFrame, group_by_columns: Optional[List[str]] = None) -> pd.DataFrame:
+    def _simple_aggregation(
+        self, df: pd.DataFrame, group_by_columns: Optional[List[str]] = None
+    ) -> pd.DataFrame:
         """Perform simple aggregation without time grouping."""
         if group_by_columns is None:
             group_by_columns = []
@@ -417,7 +477,9 @@ class AggregationProcessor:
 
         return aggregated
 
-    def _perform_aggregation(self, df: pd.DataFrame, group_columns: List[str]) -> pd.DataFrame:
+    def _perform_aggregation(
+        self, df: pd.DataFrame, group_columns: List[str]
+    ) -> pd.DataFrame:
         """Perform the actual aggregation."""
         grouped = df.groupby(group_columns)
 
@@ -447,7 +509,10 @@ class AggregationProcessor:
 
     def _create_summary_statistics(self, df: pd.DataFrame) -> pd.DataFrame:
         """Create summary statistics for the entire dataset."""
-        summary = {"total_records": len(df), "processing_timestamp": datetime.now(timezone.utc)}
+        summary = {
+            "total_records": len(df),
+            "processing_timestamp": datetime.now(timezone.utc),
+        }
 
         # Add numeric column statistics
         numeric_columns = df.select_dtypes(include=[np.number]).columns
@@ -462,7 +527,9 @@ class AggregationProcessor:
         categorical_columns = df.select_dtypes(include=["object"]).columns
         for col in categorical_columns:
             summary[f"{col}_unique_count"] = df[col].nunique()
-            summary[f"{col}_most_common"] = df[col].mode().iloc[0] if not df[col].mode().empty else None
+            summary[f"{col}_most_common"] = (
+                df[col].mode().iloc[0] if not df[col].mode().empty else None
+            )
 
         return pd.DataFrame([summary])
 
@@ -501,11 +568,15 @@ class MLFeatureProcessor:
             features_df = self._create_interaction_features(features_df)
             features_df = self._create_aggregated_features(features_df)
 
-            self.logger.info(f"Created {len(features_df.columns)} features for {table_name}")
+            self.logger.info(
+                f"Created {len(features_df.columns)} features for {table_name}"
+            )
             return features_df
 
         except Exception as e:
-            self.logger.error("ML feature creation failed for %s: %s", table_name, str(e))
+            self.logger.error(
+                "ML feature creation failed for %s: %s", table_name, str(e)
+            )
             raise DataProcessingError("ML feature creation failed: %s" % str(e))
 
     def _create_numeric_features(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -578,10 +649,18 @@ class MLFeatureProcessor:
                     features_df[f"{col}_hour"] = dates.dt.hour
 
                     # Cyclical features
-                    features_df[f"{col}_month_sin"] = np.sin(2 * np.pi * dates.dt.month / 12)
-                    features_df[f"{col}_month_cos"] = np.cos(2 * np.pi * dates.dt.month / 12)
-                    features_df[f"{col}_day_sin"] = np.sin(2 * np.pi * dates.dt.day / 31)
-                    features_df[f"{col}_day_cos"] = np.cos(2 * np.pi * dates.dt.day / 31)
+                    features_df[f"{col}_month_sin"] = np.sin(
+                        2 * np.pi * dates.dt.month / 12
+                    )
+                    features_df[f"{col}_month_cos"] = np.cos(
+                        2 * np.pi * dates.dt.month / 12
+                    )
+                    features_df[f"{col}_day_sin"] = np.sin(
+                        2 * np.pi * dates.dt.day / 31
+                    )
+                    features_df[f"{col}_day_cos"] = np.cos(
+                        2 * np.pi * dates.dt.day / 31
+                    )
 
                     # Time since features
                     now = datetime.now(timezone.utc)
@@ -591,10 +670,14 @@ class MLFeatureProcessor:
                     else:
                         dates = dates.dt.tz_convert("UTC")
                     features_df[f"{col}_days_since"] = (now - dates).dt.days
-                    features_df[f"{col}_hours_since"] = (now - dates).dt.total_seconds() / 3600
+                    features_df[f"{col}_hours_since"] = (
+                        now - dates
+                    ).dt.total_seconds() / 3600
 
                 except Exception as e:
-                    self.logger.warning(f"Failed to create temporal features for {col}: {str(e)}")
+                    self.logger.warning(
+                        f"Failed to create temporal features for {col}: {str(e)}"
+                    )
 
         return features_df
 
@@ -632,15 +715,25 @@ class MLFeatureProcessor:
         if customer_id_col:
             # Customer-level aggregations
             customer_stats = df.groupby(customer_id_col).agg(
-                {col: ["count", "sum", "mean", "std"] for col in df.select_dtypes(include=[np.number]).columns}
+                {
+                    col: ["count", "sum", "mean", "std"]
+                    for col in df.select_dtypes(include=[np.number]).columns
+                }
             )
 
             # Flatten column names
-            customer_stats.columns = ["_".join(col).strip() for col in customer_stats.columns]
+            customer_stats.columns = [
+                "_".join(col).strip() for col in customer_stats.columns
+            ]
             customer_stats = customer_stats.reset_index()
 
             # Merge back to original dataframe
-            features_df = features_df.merge(customer_stats, on=customer_id_col, how="left", suffixes=("", "_customer"))
+            features_df = features_df.merge(
+                customer_stats,
+                on=customer_id_col,
+                how="left",
+                suffixes=("", "_customer"),
+            )
 
         return features_df
 
@@ -657,7 +750,9 @@ class ReportingProcessor:
         self.config = config or {}
         self.logger = logging.getLogger(__name__)
 
-    def prepare_reporting_data(self, df: pd.DataFrame, report_type: str) -> pd.DataFrame:
+    def prepare_reporting_data(
+        self, df: pd.DataFrame, report_type: str
+    ) -> pd.DataFrame:
         """Prepare data for specific report types.
 
         Args:
@@ -683,7 +778,9 @@ class ReportingProcessor:
                 return df
 
         except Exception as e:
-            self.logger.error("Report preparation failed for %s: %s", report_type, str(e))
+            self.logger.error(
+                "Report preparation failed for %s: %s", report_type, str(e)
+            )
             raise DataProcessingError("Report preparation failed: %s" % str(e))
 
     def _prepare_executive_summary(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -716,11 +813,16 @@ class ReportingProcessor:
         if customer_id_col:
             # Customer-level aggregations
             customer_analytics = df.groupby(customer_id_col).agg(
-                {col: ["count", "sum", "mean"] for col in df.select_dtypes(include=[np.number]).columns}
+                {
+                    col: ["count", "sum", "mean"]
+                    for col in df.select_dtypes(include=[np.number]).columns
+                }
             )
 
             # Flatten column names
-            customer_analytics.columns = ["_".join(col).strip() for col in customer_analytics.columns]
+            customer_analytics.columns = [
+                "_".join(col).strip() for col in customer_analytics.columns
+            ]
             customer_analytics = customer_analytics.reset_index()
 
             return customer_analytics
@@ -731,7 +833,9 @@ class ReportingProcessor:
         """Prepare financial report data."""
         # Find financial columns
         financial_columns = ["amount", "price", "total", "revenue", "cost", "profit"]
-        available_financial_cols = [col for col in financial_columns if col in df.columns]
+        available_financial_cols = [
+            col for col in financial_columns if col in df.columns
+        ]
 
         if available_financial_cols:
             financial_data = df[available_financial_cols].describe()
@@ -746,9 +850,14 @@ class ReportingProcessor:
         """Prepare operational metrics report data."""
         operational_data = {
             "total_records": len(df),
-            "unique_customers": df["customer_id"].nunique() if "customer_id" in df.columns else 0,
+            "unique_customers": (
+                df["customer_id"].nunique() if "customer_id" in df.columns else 0
+            ),
             "processing_timestamp": datetime.now(timezone.utc),
-            "data_completeness": (1 - df.isnull().sum().sum() / (len(df) * len(df.columns))) * 100,
+            "data_completeness": (
+                1 - df.isnull().sum().sum() / (len(df) * len(df.columns))
+            )
+            * 100,
         }
 
         return pd.DataFrame([operational_data])
@@ -761,7 +870,9 @@ class ReportingProcessor:
         # Simple quality score based on completeness
         total_cells = len(df) * len(df.columns)
         null_cells = df.isnull().sum().sum()
-        completeness = (total_cells - null_cells) / total_cells if total_cells > 0 else 0
+        completeness = (
+            (total_cells - null_cells) / total_cells if total_cells > 0 else 0
+        )
 
         return round(completeness * 100, 2)
 
@@ -785,7 +896,9 @@ class GoldLayerProcessor:
         self.reporting_processor = ReportingProcessor(config.get("reporting", {}))
 
     def process_silver_to_gold(
-        self, silver_data: Dict[str, pd.DataFrame], aggregation_level: AggregationLevel = AggregationLevel.DAILY
+        self,
+        silver_data: Dict[str, pd.DataFrame],
+        aggregation_level: AggregationLevel = AggregationLevel.DAILY,
     ) -> Dict[str, Any]:
         """Process silver layer data to gold layer.
 
@@ -797,7 +910,9 @@ class GoldLayerProcessor:
             Dictionary containing processed gold data and metadata
         """
         try:
-            self.logger.info(f"Starting gold layer processing with {aggregation_level.value} aggregation")
+            self.logger.info(
+                f"Starting gold layer processing with {aggregation_level.value} aggregation"
+            )
 
             gold_results = {}
             all_metrics = []
@@ -807,14 +922,20 @@ class GoldLayerProcessor:
                 self.logger.info(f"Processing table: {table_name}")
 
                 # Step 1: Calculate business metrics
-                business_metrics = self.metrics_processor.calculate_business_metrics(df, table_name)
+                business_metrics = self.metrics_processor.calculate_business_metrics(
+                    df, table_name
+                )
                 all_metrics.extend(business_metrics)
 
                 # Step 2: Aggregate data
-                aggregated_df = self.aggregation_processor.aggregate_data(df, aggregation_level)
+                aggregated_df = self.aggregation_processor.aggregate_data(
+                    df, aggregation_level
+                )
 
                 # Step 3: Create ML features
-                features_df = self.feature_processor.create_ml_features(aggregated_df, table_name)
+                features_df = self.feature_processor.create_ml_features(
+                    aggregated_df, table_name
+                )
 
                 # Step 4: Prepare reporting data
                 reporting_data = {}
@@ -825,11 +946,15 @@ class GoldLayerProcessor:
                     "operational_metrics",
                 ]:
                     try:
-                        reporting_data[report_type] = self.reporting_processor.prepare_reporting_data(
-                            features_df, report_type
+                        reporting_data[report_type] = (
+                            self.reporting_processor.prepare_reporting_data(
+                                features_df, report_type
+                            )
                         )
                     except Exception as e:
-                        self.logger.warning(f"Failed to prepare {report_type} for {table_name}: {str(e)}")
+                        self.logger.warning(
+                            f"Failed to prepare {report_type} for {table_name}: {str(e)}"
+                        )
                         reporting_data[report_type] = pd.DataFrame()
 
                 # Store results
@@ -848,7 +973,10 @@ class GoldLayerProcessor:
                 }
 
             # Create overall metadata
-            total_records = sum(result["processing_metadata"]["record_count"] for result in gold_results.values())
+            total_records = sum(
+                result["processing_metadata"]["record_count"]
+                for result in gold_results.values()
+            )
             overall_quality_score = self._calculate_overall_quality_score(silver_data)
 
             metadata = GoldLayerMetadata(
@@ -873,14 +1001,18 @@ class GoldLayerProcessor:
                 },
             }
 
-            self.logger.info(f"Gold layer processing completed: {len(source_tables)} tables, {total_records} records")
+            self.logger.info(
+                f"Gold layer processing completed: {len(source_tables)} tables, {total_records} records"
+            )
             return result
 
         except Exception as e:
             self.logger.error("Gold layer processing failed: %s", str(e))
             raise DataProcessingError("Gold layer processing failed: %s" % str(e))
 
-    def _calculate_overall_quality_score(self, silver_data: Dict[str, pd.DataFrame]) -> float:
+    def _calculate_overall_quality_score(
+        self, silver_data: Dict[str, pd.DataFrame]
+    ) -> float:
         """Calculate overall quality score across all silver data."""
         if not silver_data:
             return 0.0
@@ -896,7 +1028,9 @@ class GoldLayerProcessor:
                 # Simple quality score based on completeness
                 total_cells = len(df) * len(df.columns)
                 null_cells = df.isnull().sum().sum()
-                completeness = (total_cells - null_cells) / total_cells if total_cells > 0 else 0
+                completeness = (
+                    (total_cells - null_cells) / total_cells if total_cells > 0 else 0
+                )
 
                 # Weight by record count
                 weight = len(df) / total_records

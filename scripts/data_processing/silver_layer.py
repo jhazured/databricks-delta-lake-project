@@ -84,7 +84,9 @@ class DataCleaningProcessor:
             DataProcessingError: If cleaning fails
         """
         try:
-            self.logger.info(f"Starting data cleaning for {source_table} with {len(df)} records")
+            self.logger.info(
+                f"Starting data cleaning for {source_table} with {len(df)} records"
+            )
 
             original_count = len(df)
             cleaned_df = df.copy()
@@ -112,7 +114,9 @@ class DataCleaningProcessor:
             cleaned_df = self._add_silver_metadata(cleaned_df, source_table)
 
             final_count = len(cleaned_df)
-            self.logger.info(f"Data cleaning completed: {original_count} -> {final_count} records")
+            self.logger.info(
+                f"Data cleaning completed: {original_count} -> {final_count} records"
+            )
 
             return cleaned_df
 
@@ -151,7 +155,10 @@ class DataCleaningProcessor:
             elif df_cleaned[column].dtype == "bool":  # Boolean columns
                 # Fill missing booleans with False
                 df_cleaned[column] = df_cleaned[column].fillna(False)
-            elif df_cleaned[column].dtype == "object" and df_cleaned[column].isin([True, False, None]).any():
+            elif (
+                df_cleaned[column].dtype == "object"
+                and df_cleaned[column].isin([True, False, None]).any()
+            ):
                 # Handle boolean-like object columns
                 df_cleaned[column] = df_cleaned[column].fillna(False)
 
@@ -166,7 +173,9 @@ class DataCleaningProcessor:
         for column in text_columns:
             if column not in ["id", "email", "phone"]:  # Skip ID fields
                 # Trim whitespace and convert to title case
-                df_cleaned[column] = df_cleaned[column].astype(str).str.strip().str.title()
+                df_cleaned[column] = (
+                    df_cleaned[column].astype(str).str.strip().str.title()
+                )
 
         return df_cleaned
 
@@ -234,7 +243,9 @@ class DataCleaningProcessor:
             upper_bound = Q3 + 1.5 * IQR
 
             # Cap outliers instead of removing them
-            df_cleaned[column] = df_cleaned[column].clip(lower=lower_bound, upper=upper_bound)
+            df_cleaned[column] = df_cleaned[column].clip(
+                lower=lower_bound, upper=upper_bound
+            )
 
         return df_cleaned
 
@@ -263,7 +274,9 @@ class DataCleaningProcessor:
         # Calculate completeness score
         total_cells = len(df) * len(df.columns)
         null_cells = df.isnull().sum().sum()
-        completeness = (total_cells - null_cells) / total_cells if total_cells > 0 else 0
+        completeness = (
+            (total_cells - null_cells) / total_cells if total_cells > 0 else 0
+        )
 
         # Simple quality score based on completeness
         return round(completeness * 100, 2)
@@ -301,13 +314,21 @@ class DataStandardizationProcessor:
                 "Illinois": "IL",
                 "Pennsylvania": "PA",
             },
-            "status_mapping": {"active": "A", "inactive": "I", "pending": "P", "suspended": "S", "cancelled": "C"},
+            "status_mapping": {
+                "active": "A",
+                "inactive": "I",
+                "pending": "P",
+                "suspended": "S",
+                "cancelled": "C",
+            },
         }
 
         # Update with custom mappings
         self.standardization_mappings.update(self.config.get("mappings", {}))
 
-    def standardize_dataframe(self, df: pd.DataFrame, source_table: str) -> pd.DataFrame:
+    def standardize_dataframe(
+        self, df: pd.DataFrame, source_table: str
+    ) -> pd.DataFrame:
         """Standardize a dataframe according to configured mappings.
 
         Args:
@@ -333,7 +354,9 @@ class DataStandardizationProcessor:
             return standardized_df
 
         except Exception as e:
-            self.logger.error("Data standardization failed for %s: %s", source_table, str(e))
+            self.logger.error(
+                "Data standardization failed for %s: %s", source_table, str(e)
+            )
             raise DataProcessingError("Data standardization failed: %s" % str(e))
 
     def _standardize_country_codes(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -381,7 +404,9 @@ class DataStandardizationProcessor:
                     df_std[column] = pd.to_datetime(df_std[column], errors="coerce")
                     df_std[column] = df_std[column].dt.strftime("%Y-%m-%d %H:%M:%S")
                 except Exception as e:
-                    self.logger.warning(f"Failed to standardize date column {column}: {str(e)}")
+                    self.logger.warning(
+                        f"Failed to standardize date column {column}: {str(e)}"
+                    )
 
         return df_std
 
@@ -395,11 +420,19 @@ class DataStandardizationProcessor:
             if column in df_std.columns:
                 try:
                     # Remove currency symbols and convert to float
-                    df_std[column] = df_std[column].astype(str).str.replace(r"[^\d.-]", "", regex=True)
+                    df_std[column] = (
+                        df_std[column]
+                        .astype(str)
+                        .str.replace(r"[^\d.-]", "", regex=True)
+                    )
                     df_std[column] = pd.to_numeric(df_std[column], errors="coerce")
-                    df_std[column] = df_std[column].round(2)  # Round to 2 decimal places
+                    df_std[column] = df_std[column].round(
+                        2
+                    )  # Round to 2 decimal places
                 except Exception as e:
-                    self.logger.warning(f"Failed to standardize currency column {column}: {str(e)}")
+                    self.logger.warning(
+                        f"Failed to standardize currency column {column}: {str(e)}"
+                    )
 
         return df_std
 
@@ -418,7 +451,9 @@ class DataQualityProcessor:
         self.validator = DataValidator()
         self.schema_validator = SchemaValidator()
 
-    def assess_data_quality(self, df: pd.DataFrame, source_table: str) -> DataQualityMetrics:
+    def assess_data_quality(
+        self, df: pd.DataFrame, source_table: str
+    ) -> DataQualityMetrics:
         """Assess data quality metrics for a dataframe.
 
         Args:
@@ -441,7 +476,9 @@ class DataQualityProcessor:
             uniqueness = self._calculate_uniqueness(df)
 
             # Calculate overall score
-            overall_score = (completeness + accuracy + consistency + validity + uniqueness) / 5
+            overall_score = (
+                completeness + accuracy + consistency + validity + uniqueness
+            ) / 5
 
             # Determine quality level
             if overall_score >= 95:
@@ -466,11 +503,15 @@ class DataQualityProcessor:
                 error_count=0,  # Will be updated during processing
             )
 
-            self.logger.info(f"Data quality assessment completed: {quality_level.value} ({overall_score:.1f}%)")
+            self.logger.info(
+                f"Data quality assessment completed: {quality_level.value} ({overall_score:.1f}%)"
+            )
             return metrics
 
         except Exception as e:
-            self.logger.error("Data quality assessment failed for %s: %s", source_table, str(e))
+            self.logger.error(
+                "Data quality assessment failed for %s: %s", source_table, str(e)
+            )
             raise DataProcessingError("Data quality assessment failed: %s" % str(e))
 
     def _calculate_completeness(self, df: pd.DataFrame) -> float:
@@ -493,14 +534,18 @@ class DataQualityProcessor:
         # Check email format accuracy
         if "email" in df.columns:
             email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-            valid_emails = df["email"].astype(str).str.match(email_pattern, na=False).sum()
+            valid_emails = (
+                df["email"].astype(str).str.match(email_pattern, na=False).sum()
+            )
             email_accuracy = (valid_emails / len(df)) * 100
             accuracy_score = min(accuracy_score, email_accuracy)
 
         # Check phone format accuracy
         if "phone" in df.columns:
             phone_pattern = r"^\+?[1-9]\d{1,14}$"
-            valid_phones = df["phone"].astype(str).str.match(phone_pattern, na=False).sum()
+            valid_phones = (
+                df["phone"].astype(str).str.match(phone_pattern, na=False).sum()
+            )
             phone_accuracy = (valid_phones / len(df)) * 100
             accuracy_score = min(accuracy_score, phone_accuracy)
 
@@ -545,7 +590,13 @@ class DataQualityProcessor:
 
         # Check status validity
         if "status" in df.columns:
-            valid_statuses = ["A", "I", "P", "S", "C"]  # Active, Inactive, Pending, Suspended, Cancelled
+            valid_statuses = [
+                "A",
+                "I",
+                "P",
+                "S",
+                "C",
+            ]  # Active, Inactive, Pending, Suspended, Cancelled
             invalid_statuses = (~df["status"].isin(valid_statuses)).sum()
             status_validity = ((len(df) - invalid_statuses) / len(df)) * 100
             validity_score = min(validity_score, status_validity)
@@ -627,7 +678,14 @@ class DataEnrichmentProcessor:
             enriched_df["age_group"] = pd.cut(
                 df["age"],
                 bins=[0, 18, 25, 35, 50, 65, 100],
-                labels=["Minor", "Young Adult", "Adult", "Middle Age", "Senior", "Elderly"],
+                labels=[
+                    "Minor",
+                    "Young Adult",
+                    "Adult",
+                    "Middle Age",
+                    "Senior",
+                    "Elderly",
+                ],
             )
 
         return enriched_df
@@ -690,7 +748,9 @@ class DataEnrichmentProcessor:
                         enriched_df["days_since_creation"] = (now - dates).dt.days
 
                 except Exception as e:
-                    self.logger.warning(f"Failed to add temporal features for {column}: {str(e)}")
+                    self.logger.warning(
+                        f"Failed to add temporal features for {column}: {str(e)}"
+                    )
 
         return enriched_df
 
@@ -739,11 +799,17 @@ class SilverLayerProcessor:
 
         # Initialize sub-processors
         self.cleaning_processor = DataCleaningProcessor(config.get("cleaning", {}))
-        self.standardization_processor = DataStandardizationProcessor(config.get("standardization", {}))
+        self.standardization_processor = DataStandardizationProcessor(
+            config.get("standardization", {})
+        )
         self.quality_processor = DataQualityProcessor(config.get("quality", {}))
-        self.enrichment_processor = DataEnrichmentProcessor(config.get("enrichment", {}))
+        self.enrichment_processor = DataEnrichmentProcessor(
+            config.get("enrichment", {})
+        )
 
-    def process_bronze_to_silver(self, bronze_df: pd.DataFrame, source_table: str) -> Dict[str, Any]:
+    def process_bronze_to_silver(
+        self, bronze_df: pd.DataFrame, source_table: str
+    ) -> Dict[str, Any]:
         """Process bronze layer data to silver layer.
 
         Args:
@@ -757,19 +823,29 @@ class SilverLayerProcessor:
             self.logger.info(f"Starting silver layer processing for {source_table}")
 
             # Step 1: Assess initial data quality
-            initial_quality = self.quality_processor.assess_data_quality(bronze_df, source_table)
+            initial_quality = self.quality_processor.assess_data_quality(
+                bronze_df, source_table
+            )
 
             # Step 2: Clean the data
-            cleaned_df = self.cleaning_processor.clean_dataframe(bronze_df, source_table)
+            cleaned_df = self.cleaning_processor.clean_dataframe(
+                bronze_df, source_table
+            )
 
             # Step 3: Standardize the data
-            standardized_df = self.standardization_processor.standardize_dataframe(cleaned_df, source_table)
+            standardized_df = self.standardization_processor.standardize_dataframe(
+                cleaned_df, source_table
+            )
 
             # Step 4: Enrich the data
-            enriched_df = self.enrichment_processor.enrich_dataframe(standardized_df, source_table)
+            enriched_df = self.enrichment_processor.enrich_dataframe(
+                standardized_df, source_table
+            )
 
             # Step 5: Assess final data quality
-            final_quality = self.quality_processor.assess_data_quality(enriched_df, source_table)
+            final_quality = self.quality_processor.assess_data_quality(
+                enriched_df, source_table
+            )
 
             # Prepare result
             result = {
@@ -781,20 +857,27 @@ class SilverLayerProcessor:
                     "processing_timestamp": datetime.now(timezone.utc),
                     "processing_version": "1.0",
                     "records_processed": len(enriched_df),
-                    "quality_improvement": final_quality.overall_score - initial_quality.overall_score,
+                    "quality_improvement": final_quality.overall_score
+                    - initial_quality.overall_score,
                 },
             }
 
             self.logger.info(f"Silver layer processing completed for {source_table}")
-            self.logger.info(f"Quality improvement: {result['processing_metadata']['quality_improvement']:.1f}%")
+            self.logger.info(
+                f"Quality improvement: {result['processing_metadata']['quality_improvement']:.1f}%"
+            )
 
             return result
 
         except Exception as e:
-            self.logger.error("Silver layer processing failed for %s: %s", source_table, str(e))
+            self.logger.error(
+                "Silver layer processing failed for %s: %s", source_table, str(e)
+            )
             raise DataProcessingError("Silver layer processing failed: %s" % str(e))
 
-    def process_multiple_tables(self, bronze_data: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
+    def process_multiple_tables(
+        self, bronze_data: Dict[str, pd.DataFrame]
+    ) -> Dict[str, Any]:
         """Process multiple bronze tables to silver layer.
 
         Args:

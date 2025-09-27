@@ -90,7 +90,9 @@ class MedallionPipeline:
                 self.logger.info("Step 5: Saving pipeline results")
                 self._save_pipeline_results(bronze_data, silver_results, gold_results)
 
-            self.logger.info("Complete medallion architecture pipeline finished successfully")
+            self.logger.info(
+                "Complete medallion architecture pipeline finished successfully"
+            )
 
             return {
                 "bronze_data": bronze_data,
@@ -98,7 +100,9 @@ class MedallionPipeline:
                 "gold_results": gold_results,
                 "pipeline_summary": pipeline_summary,
                 "status": "success",
-                "processing_time": (datetime.now(timezone.utc) - pipeline_start_time).total_seconds(),
+                "processing_time": (
+                    datetime.now(timezone.utc) - pipeline_start_time
+                ).total_seconds(),
             }
 
         except Exception as e:
@@ -119,15 +123,19 @@ class MedallionPipeline:
                 # Convert to DataFrame and add some business-specific fields
                 df = pd.DataFrame(customer_data)
                 df["customer_id"] = df["id"]
-                df["registration_date"] = pd.date_range(start="2023-01-01", periods=len(df), freq="1H").strftime(
-                    "%Y-%m-%d %H:%M:%S"
+                df["registration_date"] = pd.date_range(
+                    start="2023-01-01", periods=len(df), freq="1H"
+                ).strftime("%Y-%m-%d %H:%M:%S")
+                df["last_login"] = pd.date_range(
+                    start="2024-01-01", periods=len(df), freq="2H"
+                ).strftime("%Y-%m-%d %H:%M:%S")
+                df["status"] = np.random.choice(
+                    ["A", "I", "P"], len(df), p=[0.7, 0.2, 0.1]
                 )
-                df["last_login"] = pd.date_range(start="2024-01-01", periods=len(df), freq="2H").strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
-                df["status"] = np.random.choice(["A", "I", "P"], len(df), p=[0.7, 0.2, 0.1])
                 df["loyalty_tier"] = np.random.choice(
-                    ["Bronze", "Silver", "Gold", "Platinum"], len(df), p=[0.4, 0.3, 0.2, 0.1]
+                    ["Bronze", "Silver", "Gold", "Platinum"],
+                    len(df),
+                    p=[0.4, 0.3, 0.2, 0.1],
                 )
 
                 bronze_data[table_name] = df
@@ -141,12 +149,17 @@ class MedallionPipeline:
                             "order_id": f"ORD_{i + 1:06d}",
                             "customer_id": f"CUST_{np.random.randint(1, sample_size // 2):06d}",
                             "product_id": f"PROD_{np.random.randint(1, 100):06d}",
-                            "order_date": pd.Timestamp.now() - pd.Timedelta(days=np.random.randint(0, 365)),
+                            "order_date": pd.Timestamp.now()
+                            - pd.Timedelta(days=np.random.randint(0, 365)),
                             "amount": round(np.random.uniform(10, 1000), 2),
                             "quantity": np.random.randint(1, 10),
-                            "status": np.random.choice(["completed", "pending", "cancelled"], p=[0.8, 0.15, 0.05]),
+                            "status": np.random.choice(
+                                ["completed", "pending", "cancelled"],
+                                p=[0.8, 0.15, 0.05],
+                            ),
                             "payment_method": np.random.choice(
-                                ["credit_card", "debit_card", "paypal", "cash"], p=[0.4, 0.3, 0.2, 0.1]
+                                ["credit_card", "debit_card", "paypal", "cash"],
+                                p=[0.4, 0.3, 0.2, 0.1],
                             ),
                             "shipping_address": (
                                 f"{np.random.randint(100, 9999)} Main St, City, State "
@@ -160,7 +173,14 @@ class MedallionPipeline:
             elif table_name == "products":
                 # Generate product data
                 product_data = []
-                categories = ["Electronics", "Clothing", "Books", "Home & Garden", "Sports", "Beauty"]
+                categories = [
+                    "Electronics",
+                    "Clothing",
+                    "Books",
+                    "Home & Garden",
+                    "Sports",
+                    "Beauty",
+                ]
 
                 for i in range(100):  # 100 products
                     product_data.append(
@@ -172,7 +192,8 @@ class MedallionPipeline:
                             "cost": round(np.random.uniform(2, 250), 2),
                             "inventory_count": np.random.randint(0, 1000),
                             "supplier_id": f"SUPP_{np.random.randint(1, 20):03d}",
-                            "created_date": pd.Timestamp.now() - pd.Timedelta(days=np.random.randint(0, 1095)),
+                            "created_date": pd.Timestamp.now()
+                            - pd.Timedelta(days=np.random.randint(0, 1095)),
                             "is_active": np.random.choice([True, False], p=[0.9, 0.1]),
                         }
                     )
@@ -182,7 +203,9 @@ class MedallionPipeline:
         self.logger.info(f"Generated bronze data for {len(bronze_data)} tables")
         return bronze_data
 
-    def _process_bronze_to_silver(self, bronze_data: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
+    def _process_bronze_to_silver(
+        self, bronze_data: Dict[str, pd.DataFrame]
+    ) -> Dict[str, Any]:
         """Process bronze data to silver layer."""
         silver_results = {}
 
@@ -200,7 +223,8 @@ class MedallionPipeline:
                 improvement = final_quality - initial_quality
 
                 self.logger.info(
-                    f"{table_name} quality: {initial_quality:.1f}% -> {final_quality:.1f}% " f"(+{improvement:.1f}%)"
+                    f"{table_name} quality: {initial_quality:.1f}% -> {final_quality:.1f}% "
+                    f"(+{improvement:.1f}%)"
                 )
 
             except Exception as e:
@@ -254,8 +278,12 @@ class MedallionPipeline:
         # Silver layer summary
         silver_summary = {
             "tables_processed": len(silver_results),
-            "successful_tables": sum(1 for result in silver_results.values() if "error" not in result),
-            "failed_tables": sum(1 for result in silver_results.values() if "error" in result),
+            "successful_tables": sum(
+                1 for result in silver_results.values() if "error" not in result
+            ),
+            "failed_tables": sum(
+                1 for result in silver_results.values() if "error" in result
+            ),
             "quality_improvements": {},
         }
 
@@ -274,7 +302,9 @@ class MedallionPipeline:
             "tables_processed": len(gold_results.get("gold_data", {})),
             "total_records": gold_results.get("summary", {}).get("total_records", 0),
             "total_metrics": gold_results.get("summary", {}).get("total_metrics", 0),
-            "aggregation_level": gold_results.get("summary", {}).get("aggregation_level", "unknown"),
+            "aggregation_level": gold_results.get("summary", {}).get(
+                "aggregation_level", "unknown"
+            ),
         }
 
         # Overall pipeline summary
@@ -286,14 +316,18 @@ class MedallionPipeline:
             "silver_layer": silver_summary,
             "gold_layer": gold_summary,
             "data_quality_overview": self._generate_quality_overview(silver_results),
-            "business_metrics_summary": self._generate_business_metrics_summary(gold_results),
+            "business_metrics_summary": self._generate_business_metrics_summary(
+                gold_results
+            ),
             "pipeline_configuration": self.pipeline_config,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
         return pipeline_summary
 
-    def _generate_quality_overview(self, silver_results: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_quality_overview(
+        self, silver_results: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate data quality overview."""
         quality_overview = {
             "overall_quality_score": 0.0,
@@ -325,11 +359,15 @@ class MedallionPipeline:
                 table_count += 1
 
         if table_count > 0:
-            quality_overview["overall_quality_score"] = round(total_score / table_count, 2)
+            quality_overview["overall_quality_score"] = round(
+                total_score / table_count, 2
+            )
 
         return quality_overview
 
-    def _generate_business_metrics_summary(self, gold_results: Dict[str, Any]) -> Dict[str, Any]:
+    def _generate_business_metrics_summary(
+        self, gold_results: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """Generate business metrics summary."""
         if "metadata" not in gold_results:
             return {}
@@ -337,7 +375,11 @@ class MedallionPipeline:
         metadata = gold_results["metadata"]
         metrics = metadata.business_metrics
 
-        metrics_summary = {"total_metrics": len(metrics), "metrics_by_type": {}, "top_metrics": []}
+        metrics_summary = {
+            "total_metrics": len(metrics),
+            "metrics_by_type": {},
+            "top_metrics": [],
+        }
 
         # Group metrics by type
         for metric in metrics:
@@ -363,7 +405,11 @@ class MedallionPipeline:
                 "type": metric.metric_type.value,
                 "value": metric.value,
                 "dimension": metric.dimension,
-                "calculation_date": metric.calculation_date.isoformat() if metric.calculation_date else None,
+                "calculation_date": (
+                    metric.calculation_date.isoformat()
+                    if metric.calculation_date
+                    else None
+                ),
             }
             for metric in sorted_metrics[:10]
         ]
@@ -371,7 +417,10 @@ class MedallionPipeline:
         return metrics_summary
 
     def _save_pipeline_results(
-        self, bronze_data: Dict[str, pd.DataFrame], silver_results: Dict[str, Any], gold_results: Dict[str, Any]
+        self,
+        bronze_data: Dict[str, pd.DataFrame],
+        silver_results: Dict[str, Any],
+        gold_results: Dict[str, Any],
     ) -> None:
         """Save pipeline results to files."""
         output_dir = Path(self.config.get("output_directory", "output"))
@@ -430,7 +479,9 @@ class MedallionPipeline:
         # Save pipeline summary
         summary_file = output_dir / f"pipeline_summary_{timestamp}.json"
         with open(summary_file, "w") as f:
-            json.dump(gold_results.get("pipeline_summary", {}), f, indent=2, default=str)
+            json.dump(
+                gold_results.get("pipeline_summary", {}), f, indent=2, default=str
+            )
 
         self.logger.info(f"Pipeline results saved to: {output_dir}")
 
@@ -438,7 +489,10 @@ class MedallionPipeline:
 def main():
     """Main function to run the medallion pipeline."""
     # Configure logging
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
 
     # Pipeline configuration
     config = {
@@ -506,7 +560,9 @@ def main():
         if metrics:
             print("\n💰 BUSINESS METRICS SUMMARY:")
             for metric_type, stats in metrics["metrics_by_type"].items():
-                print(f"   {metric_type.replace('_', ' ').title()}: {stats['average']:.2f} (avg)")
+                print(
+                    f"   {metric_type.replace('_', ' ').title()}: {stats['average']:.2f} (avg)"
+                )
 
         print(f"\n✅ All results saved to: {config['output_directory']}")
         print("=" * 80)
