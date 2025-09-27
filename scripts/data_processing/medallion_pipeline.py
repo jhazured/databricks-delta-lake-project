@@ -1,5 +1,4 @@
-"""
-Complete Medallion Architecture Pipeline
+"""Complete Medallion Architecture Pipeline.
 
 This script demonstrates the complete medallion architecture implementation,
 processing data through Bronze, Silver, and Gold layers.
@@ -35,21 +34,20 @@ class MedallionPipeline:
         self.config = config or {}
         self.logger = logging.getLogger(__name__)
 
-        # Initialize processors
-        self.bronze_processor = BronzeLayerProcessor()
-        self.silver_processor = SilverLayerProcessor(self.config.get("silver", {}))
-        self.gold_processor = GoldLayerProcessor(self.config.get("gold", {}))
-        self.data_generator = SampleDataGenerator()
-
-        # Pipeline configuration
-        self.pipeline_config = {
+        # Type the pipeline config properly
+        self.pipeline_config: Dict[str, Any] = {
             "bronze_tables": ["customers", "orders", "products"],
             "aggregation_level": AggregationLevel.DAILY,
             "output_format": "parquet",
             "enable_quality_checks": True,
             "enable_ml_features": True,
-            "enable_reporting": True,
         }
+
+        # Initialize processors
+        self.bronze_processor = BronzeLayerProcessor()
+        self.silver_processor = SilverLayerProcessor(self.config.get("silver", {}))
+        self.gold_processor = GoldLayerProcessor(self.config.get("gold", {}))
+        self.data_generator = SampleDataGenerator()
 
         # Update with custom config
         self.pipeline_config.update(self.config.get("pipeline", {}))
@@ -147,7 +145,9 @@ class MedallionPipeline:
                     order_data.append(
                         {
                             "order_id": f"ORD_{i + 1:06d}",
-                            "customer_id": f"CUST_{np.random.randint(1, sample_size // 2):06d}",
+                            "customer_id": (
+                                f"CUST_{np.random.randint(1, sample_size // 2):06d}"
+                            ),
                             "product_id": f"PROD_{np.random.randint(1, 100):06d}",
                             "order_date": pd.Timestamp.now()
                             - pd.Timedelta(days=np.random.randint(0, 365)),
@@ -223,8 +223,8 @@ class MedallionPipeline:
                 improvement = final_quality - initial_quality
 
                 self.logger.info(
-                    f"{table_name} quality: {initial_quality:.1f}% -> {final_quality:.1f}% "
-                    f"(+{improvement:.1f}%)"
+                    f"{table_name} quality: {initial_quality:.1f}% -> "
+                    f"{final_quality:.1f}% (+{improvement:.1f}%)"
                 )
 
             except Exception as e:
@@ -276,7 +276,7 @@ class MedallionPipeline:
         }
 
         # Silver layer summary
-        silver_summary = {
+        silver_summary: Dict[str, Any] = {
             "tables_processed": len(silver_results),
             "successful_tables": sum(
                 1 for result in silver_results.values() if "error" not in result
@@ -288,7 +288,11 @@ class MedallionPipeline:
         }
 
         for table_name, result in silver_results.items():
-            if "initial_quality" in result and "final_quality" in result:
+            if (
+                isinstance(result, dict)
+                and "initial_quality" in result
+                and "final_quality" in result
+            ):
                 initial = result["initial_quality"].overall_score
                 final = result["final_quality"].overall_score
                 silver_summary["quality_improvements"][table_name] = {
@@ -329,7 +333,7 @@ class MedallionPipeline:
         self, silver_results: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Generate data quality overview."""
-        quality_overview = {
+        quality_overview: Dict[str, Any] = {
             "overall_quality_score": 0.0,
             "quality_distribution": {"excellent": 0, "good": 0, "fair": 0, "poor": 0},
             "table_quality_scores": {},
@@ -339,7 +343,7 @@ class MedallionPipeline:
         table_count = 0
 
         for table_name, result in silver_results.items():
-            if "final_quality" in result:
+            if isinstance(result, dict) and "final_quality" in result:
                 quality = result["final_quality"]
                 score = quality.overall_score
                 level = quality.quality_level.value
@@ -375,7 +379,7 @@ class MedallionPipeline:
         metadata = gold_results["metadata"]
         metrics = metadata.business_metrics
 
-        metrics_summary = {
+        metrics_summary: Dict[str, Any] = {
             "total_metrics": len(metrics),
             "metrics_by_type": {},
             "top_metrics": [],
@@ -384,13 +388,16 @@ class MedallionPipeline:
         # Group metrics by type
         for metric in metrics:
             metric_type = metric.metric_type.value
-            if metric_type not in metrics_summary["metrics_by_type"]:
-                metrics_summary["metrics_by_type"][metric_type] = []
-            metrics_summary["metrics_by_type"][metric_type].append(metric.value)
+            # Type-safe access to nested dictionary
+            metrics_by_type = metrics_summary.get("metrics_by_type", {})
+            if metric_type not in metrics_by_type:
+                metrics_by_type[metric_type] = []
+            metrics_by_type[metric_type].append(metric.value)
 
         # Calculate averages for each metric type
-        for metric_type, values in metrics_summary["metrics_by_type"].items():
-            metrics_summary["metrics_by_type"][metric_type] = {
+        metrics_by_type = metrics_summary.get("metrics_by_type", {})
+        for metric_type, values in metrics_by_type.items():
+            metrics_by_type[metric_type] = {
                 "count": len(values),
                 "average": round(sum(values) / len(values), 2),
                 "total": round(sum(values), 2),
@@ -486,7 +493,7 @@ class MedallionPipeline:
         self.logger.info(f"Pipeline results saved to: {output_dir}")
 
 
-def main():
+def main() -> None:
     """Main function to run the medallion pipeline."""
     # Configure logging
     logging.basicConfig(
@@ -561,7 +568,8 @@ def main():
             print("\n💰 BUSINESS METRICS SUMMARY:")
             for metric_type, stats in metrics["metrics_by_type"].items():
                 print(
-                    f"   {metric_type.replace('_', ' ').title()}: {stats['average']:.2f} (avg)"
+                    f"   {metric_type.replace('_', ' ').title()}: "
+                    f"{stats['average']:.2f} (avg)"
                 )
 
         print(f"\n✅ All results saved to: {config['output_directory']}")

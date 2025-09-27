@@ -4,9 +4,7 @@ import json
 import re
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Any, Callable, Dict, List, Optional, Union
-
-import pandas as pd
+from typing import Any, Callable, Dict, List, Union
 
 from .exceptions import ValidationError
 

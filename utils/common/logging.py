@@ -4,7 +4,7 @@ import json
 import logging
 import sys
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 
 def setup_logging(
@@ -70,6 +70,11 @@ class StructuredLogger:
     """Structured logger for JSON-formatted logs."""
 
     def __init__(self, name: str):
+        """Initialize the structured logger.
+
+        Args:
+            name: Logger name.
+        """
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.INFO)
 

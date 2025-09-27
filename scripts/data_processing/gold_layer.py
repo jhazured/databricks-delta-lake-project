@@ -1,5 +1,4 @@
-"""
-Gold Layer Data Processing
+"""Gold Layer Data Processing.
 
 This module implements the gold layer of the medallion architecture,
 focusing on business logic, aggregations, and report-ready data preparation.
@@ -257,7 +256,8 @@ class BusinessMetricsProcessor:
                 df[date_column] = pd.to_datetime(df[date_column], errors="coerce")
 
                 # Calculate retention rate (simplified)
-                # This is a basic implementation - in practice, you'd need historical data
+                # This is a basic implementation - in practice, you'd need historical
+                # data
                 current_date = datetime.now(timezone.utc)
                 thirty_days_ago = current_date - timedelta(days=30)
 
@@ -352,7 +352,7 @@ class AggregationProcessor:
         self,
         df: pd.DataFrame,
         aggregation_level: AggregationLevel,
-        group_by_columns: List[str] = None,
+        group_by_columns: Optional[List[str]] = None,
     ) -> pd.DataFrame:
         """Aggregate data based on specified level and grouping.
 
@@ -438,7 +438,8 @@ class AggregationProcessor:
         elif aggregation_level == AggregationLevel.YEARLY:
             return date_series.dt.to_period("Y").dt.start_time.dt.date
         else:
-            return date_series.dt.date
+            # This should never be reached due to enum coverage
+            return date_series.dt.date  # type: ignore[unreachable]
 
     def _simple_aggregation(
         self, df: pd.DataFrame, group_by_columns: Optional[List[str]] = None
@@ -469,7 +470,7 @@ class AggregationProcessor:
                 agg_functions[col] = ["count"]
 
         # Perform aggregation
-        aggregated = grouped.agg(agg_functions)
+        aggregated = grouped.agg(agg_functions)  # type: ignore[arg-type]
 
         # Flatten column names
         aggregated.columns = ["_".join(col).strip() for col in aggregated.columns]
@@ -499,7 +500,7 @@ class AggregationProcessor:
                 agg_functions[col] = ["count", "nunique"]
 
         # Perform aggregation
-        aggregated = grouped.agg(agg_functions)
+        aggregated = grouped.agg(agg_functions)  # type: ignore[arg-type]
 
         # Flatten column names
         aggregated.columns = ["_".join(col).strip() for col in aggregated.columns]
@@ -669,10 +670,12 @@ class MLFeatureProcessor:
                         dates = dates.dt.tz_localize("UTC")
                     else:
                         dates = dates.dt.tz_convert("UTC")
-                    features_df[f"{col}_days_since"] = (now - dates).dt.days
+                    # Calculate time differences with proper typing
+                    time_diff = now - dates  # type: ignore[operator]
+                    features_df[f"{col}_days_since"] = time_diff.dt.days
                     features_df[f"{col}_hours_since"] = (
-                        now - dates
-                    ).dt.total_seconds() / 3600
+                        time_diff.dt.total_seconds() / 3600
+                    )
 
                 except Exception as e:
                     self.logger.warning(
@@ -890,10 +893,14 @@ class GoldLayerProcessor:
         self.logger = logging.getLogger(__name__)
 
         # Initialize sub-processors
-        self.metrics_processor = BusinessMetricsProcessor(config.get("metrics", {}))
-        self.aggregation_processor = AggregationProcessor(config.get("aggregation", {}))
-        self.feature_processor = MLFeatureProcessor(config.get("features", {}))
-        self.reporting_processor = ReportingProcessor(config.get("reporting", {}))
+        self.metrics_processor = BusinessMetricsProcessor(
+            self.config.get("metrics", {})
+        )
+        self.aggregation_processor = AggregationProcessor(
+            self.config.get("aggregation", {})
+        )
+        self.feature_processor = MLFeatureProcessor(self.config.get("features", {}))
+        self.reporting_processor = ReportingProcessor(self.config.get("reporting", {}))
 
     def process_silver_to_gold(
         self,
@@ -911,7 +918,8 @@ class GoldLayerProcessor:
         """
         try:
             self.logger.info(
-                f"Starting gold layer processing with {aggregation_level.value} aggregation"
+                f"Starting gold layer processing with "
+                f"{aggregation_level.value} aggregation"
             )
 
             gold_results = {}
@@ -953,7 +961,8 @@ class GoldLayerProcessor:
                         )
                     except Exception as e:
                         self.logger.warning(
-                            f"Failed to prepare {report_type} for {table_name}: {str(e)}"
+                            f"Failed to prepare {report_type} for {table_name}: "
+                            f"{str(e)}"
                         )
                         reporting_data[report_type] = pd.DataFrame()
 
@@ -973,10 +982,12 @@ class GoldLayerProcessor:
                 }
 
             # Create overall metadata
-            total_records = sum(
-                result["processing_metadata"]["record_count"]
-                for result in gold_results.values()
-            )
+            total_records = 0
+            for result in gold_results.values():
+                if isinstance(result, dict):
+                    processing_metadata = result.get("processing_metadata", {})
+                    if isinstance(processing_metadata, dict):
+                        total_records += processing_metadata.get("record_count", 0)
             overall_quality_score = self._calculate_overall_quality_score(silver_data)
 
             metadata = GoldLayerMetadata(
@@ -1002,7 +1013,8 @@ class GoldLayerProcessor:
             }
 
             self.logger.info(
-                f"Gold layer processing completed: {len(source_tables)} tables, {total_records} records"
+                f"Gold layer processing completed: {len(source_tables)} tables, "
+                f"{total_records} records"
             )
             return result
 

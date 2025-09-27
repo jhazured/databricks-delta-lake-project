@@ -1,5 +1,4 @@
-"""
-Silver Layer Data Processing
+"""Silver Layer Data Processing.
 
 This module implements the silver layer of the medallion architecture,
 focusing on data cleaning, standardization, and quality improvement.
@@ -186,9 +185,9 @@ class DataCleaningProcessor:
 
         df_cleaned = df.copy()
 
-        def normalize_phone(phone):
+        def normalize_phone(phone: Any) -> str:
             if pd.isna(phone) or phone == "Unknown":
-                return phone
+                return str(phone)
 
             # Remove all non-digit characters
             digits = re.sub(r"\D", "", str(phone))
@@ -211,9 +210,9 @@ class DataCleaningProcessor:
 
         df_cleaned = df.copy()
 
-        def validate_email(email):
+        def validate_email(email: Any) -> str:
             if pd.isna(email) or email == "Unknown":
-                return email
+                return str(email)
 
             email = str(email).strip().lower()
 
@@ -221,7 +220,7 @@ class DataCleaningProcessor:
             email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
 
             if re.match(email_pattern, email):
-                return email
+                return str(email)
             else:
                 return "Invalid"  # Mark invalid emails
 
@@ -504,7 +503,8 @@ class DataQualityProcessor:
             )
 
             self.logger.info(
-                f"Data quality assessment completed: {quality_level.value} ({overall_score:.1f}%)"
+                f"Data quality assessment completed: {quality_level.value} "
+                f"({overall_score:.1f}%)"
             )
             return metrics
 
@@ -522,7 +522,7 @@ class DataQualityProcessor:
         total_cells = len(df) * len(df.columns)
         null_cells = df.isnull().sum().sum()
         completeness = (total_cells - null_cells) / total_cells
-        return round(completeness * 100, 2)
+        return float(round(completeness * 100, 2))
 
     def _calculate_accuracy(self, df: pd.DataFrame) -> float:
         """Calculate accuracy score based on data format validation."""
@@ -618,7 +618,7 @@ class DataQualityProcessor:
         else:
             uniqueness = 100.0  # No business keys to check
 
-        return round(uniqueness, 2)
+        return float(round(uniqueness, 2))
 
 
 class DataEnrichmentProcessor:
@@ -745,7 +745,9 @@ class DataEnrichmentProcessor:
                             dates = dates.dt.tz_localize("UTC")
                         else:
                             dates = dates.dt.tz_convert("UTC")
-                        enriched_df["days_since_creation"] = (now - dates).dt.days
+                        # Calculate time difference with proper typing
+                        time_diff = now - dates  # type: ignore[operator]
+                        enriched_df["days_since_creation"] = time_diff.dt.days
 
                 except Exception as e:
                     self.logger.warning(
@@ -761,7 +763,7 @@ class DataEnrichmentProcessor:
         # Simple customer segmentation based on age and activity
         if "age" in df.columns and "status" in df.columns:
 
-            def segment_customer(row):
+            def segment_customer(row: pd.Series) -> str:
                 age = row["age"]
                 status = row["status"]
 
@@ -798,13 +800,13 @@ class SilverLayerProcessor:
         self.logger = logging.getLogger(__name__)
 
         # Initialize sub-processors
-        self.cleaning_processor = DataCleaningProcessor(config.get("cleaning", {}))
+        self.cleaning_processor = DataCleaningProcessor(self.config.get("cleaning", {}))
         self.standardization_processor = DataStandardizationProcessor(
-            config.get("standardization", {})
+            self.config.get("standardization", {})
         )
-        self.quality_processor = DataQualityProcessor(config.get("quality", {}))
+        self.quality_processor = DataQualityProcessor(self.config.get("quality", {}))
         self.enrichment_processor = DataEnrichmentProcessor(
-            config.get("enrichment", {})
+            self.config.get("enrichment", {})
         )
 
     def process_bronze_to_silver(
@@ -863,9 +865,15 @@ class SilverLayerProcessor:
             }
 
             self.logger.info(f"Silver layer processing completed for {source_table}")
-            self.logger.info(
-                f"Quality improvement: {result['processing_metadata']['quality_improvement']:.1f}%"
-            )
+            # Type-safe access to processing metadata
+            processing_metadata = result.get("processing_metadata", {})
+            if isinstance(processing_metadata, dict):
+                quality_improvement = processing_metadata.get(
+                    "quality_improvement", 0.0
+                )
+            else:
+                quality_improvement = 0.0
+            self.logger.info(f"Quality improvement: {quality_improvement:.1f}%")
 
             return result
 
