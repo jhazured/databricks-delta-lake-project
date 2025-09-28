@@ -85,7 +85,7 @@ jobs:
     
     - name: Dead code detection with vulture
       run: |
-        python -m vulture src/ scripts/ --min-confidence 70 --exclude api/main.py
+        python -m vulture src/ scripts/ --min-confidence 70 --exclude src/api/main.py
     
     - name: Code complexity with radon
       run: |
@@ -140,16 +140,16 @@ jobs:
     
     - name: Lint with flake8
       run: |
-        python -m flake8 scripts/ utils/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        python -m flake8 scripts/ utils/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+        python -m flake8 src/ scripts/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        python -m flake8 src/ scripts/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
     
     - name: Check code formatting with black
       run: |
-        python -m black --check scripts/ utils/
+        python -m black --check src/ scripts/
     
     - name: Check import sorting with isort
       run: |
-        python -m isort --check-only scripts/ utils/
+        python -m isort --check-only src/ scripts/
     
     - name: Type checking with mypy
       run: |
@@ -198,7 +198,7 @@ jobs:
     
     - name: Run bandit security linter
       run: |
-        python -m bandit -r scripts/ utils/ api/ -f json -o bandit-report.json || true
+        python -m bandit -r src/ scripts/ -f json -o bandit-report.json || true
     
     - name: Run Semgrep security scan
       run: |

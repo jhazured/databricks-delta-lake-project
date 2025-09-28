@@ -26,17 +26,17 @@
 ### Local Development
 ```bash
 # Format code
-black utils/ scripts/ api/
-isort utils/ scripts/ api/
+black src/ scripts/
+isort src/ scripts/
 
 # Run linting
-flake8 utils/ scripts/ api/ --max-line-length=88
+flake8 src/ scripts/ --max-line-length=88
 
 # Run tests
 pytest testing/unit/ -v
 
 # Type checking
-mypy utils/ scripts/ api/ --ignore-missing-imports
+mypy src/ scripts/ --ignore-missing-imports
 ```
 
 ### Manual Deployment
@@ -83,11 +83,11 @@ DATABRICKS_DEPLOYMENT_JOB_ID  # Deployment job ID
 ### Code Quality Failures
 ```bash
 # Fix formatting
-black utils/ scripts/ api/
-isort utils/ scripts/ api/
+black src/ scripts/
+isort src/ scripts/
 
 # Fix linting
-flake8 utils/ scripts/ api/ --max-line-length=88
+flake8 src/ scripts/ --max-line-length=88
 ```
 
 ### Test Failures

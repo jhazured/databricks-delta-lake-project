@@ -61,8 +61,8 @@ def good_function():
 # In CI/CD pipeline
 - name: Lint with flake8
   run: |
-    flake8 utils/ scripts/ api/ --count --select=E9,F63,F7,F82 --show-source --statistics
-    flake8 utils/ scripts/ api/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+    flake8 src/ scripts/ --count --select=E9,F63,F7,F82 --show-source --statistics
+    flake8 src/ scripts/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 ```
 
 ### 2. Black - Code Formatting
@@ -413,7 +413,7 @@ def process_item_by_type(item):
 **Configuration**:
 ```bash
 # In CI/CD pipeline
-radon cc utils/ scripts/ api/ --min B --show-complexity
+radon cc src/ scripts/ --min B --show-complexity
 ```
 
 ### 9. Pytest - Unit Testing
@@ -528,36 +528,36 @@ code-quality:
   
   - name: Lint with flake8
     run: |
-      flake8 utils/ scripts/ api/ --count --select=E9,F63,F7,F82 --show-source --statistics
-      flake8 utils/ scripts/ api/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+      flake8 src/ scripts/ --count --select=E9,F63,F7,F82 --show-source --statistics
+      flake8 src/ scripts/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
   
   - name: Check code formatting with black
     run: |
-      black --check utils/ scripts/ api/
+      black --check src/ scripts/
   
   - name: Check import sorting with isort
     run: |
-      isort --check-only utils/ scripts/ api/
+      isort --check-only src/ scripts/
   
   - name: Type checking with mypy
     run: |
-      mypy utils/ scripts/ api/ --ignore-missing-imports
+      mypy src/ scripts/ --ignore-missing-imports
   
   - name: Code analysis with pylint
     run: |
-      pylint utils/ scripts/ api/ --disable=C0114,C0116 --score=y --fail-under=8.0
+      pylint src/ scripts/ --disable=C0114,C0116 --score=y --fail-under=8.0
   
   - name: Documentation style with pydocstyle
     run: |
-      pydocstyle utils/ scripts/ api/ --count
+      pydocstyle src/ scripts/ --count
   
   - name: Dead code detection with vulture
     run: |
-      vulture utils/ scripts/ api/ --min-confidence 70 --exclude api/main.py
+      vulture src/ scripts/ --min-confidence 70 --exclude api/main.py
   
   - name: Code complexity with radon
     run: |
-      radon cc utils/ scripts/ api/ --min B --show-complexity
+      radon cc src/ scripts/ --min B --show-complexity
 ```
 
 ## Best Practices
@@ -606,16 +606,16 @@ pylint utils/ --score=y
 #### Black Formatting Conflicts
 ```bash
 # Check what would be reformatted
-black --check utils/ scripts/ api/
+black --check src/ scripts/
 
 # Apply formatting
-black utils/ scripts/ api/
+black src/ scripts/
 ```
 
 #### mypy Type Errors
 ```bash
 # Check type issues
-mypy utils/ scripts/ api/ --ignore-missing-imports
+mypy src/ scripts/ --ignore-missing-imports
 
 # Install missing type stubs
 pip install types-PyYAML types-requests
