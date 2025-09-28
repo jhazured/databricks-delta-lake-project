@@ -85,7 +85,7 @@ RUN pip install --no-cache-dir -r requirements-api.txt
 
 # Copy source code
 COPY src/ ./src/
-COPY config/ ./config/
+COPY config/environments/ ./config/environments/
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \
@@ -111,7 +111,7 @@ RUN pip install --no-cache-dir pandas numpy scikit-learn
 # Copy data processing code
 COPY scripts/ ./scripts/
 COPY src/ ./src/
-COPY config/ ./config/
+COPY config/environments/ ./config/environments/
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \

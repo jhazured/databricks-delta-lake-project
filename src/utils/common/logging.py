@@ -4,7 +4,20 @@ import json
 import logging
 import sys
 from datetime import datetime, timezone
+import warnings
 from typing import Any, Callable, Optional
+import sys
+
+
+def get_utc_now() -> datetime:
+    """Get current UTC datetime, compatible across Python versions."""
+    if sys.version_info >= (3, 11):
+        return datetime.now(timezone.utc)
+    else:
+        # Suppress deprecation warning for older Python versions
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            return datetime.utcnow()
 
 
 def setup_logging(
@@ -103,7 +116,7 @@ class StructuredLogger:
     def _log(self, level: int, message: str, **kwargs: Any) -> None:
         """Internal logging method."""
         log_data = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": get_utc_now().isoformat(),
             "level": logging.getLevelName(level),
             "message": message,
             **kwargs,
@@ -143,16 +156,16 @@ def log_performance(logger: logging.Logger) -> Callable[[Callable], Callable]:
 
     def decorator(func: Callable) -> Callable:
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            start_time = datetime.utcnow()
+            start_time = get_utc_now()
             logger.info(f"Starting {func.__name__}")
 
             try:
                 result = func(*args, **kwargs)
-                duration = (datetime.utcnow() - start_time).total_seconds()
+                duration = (get_utc_now() - start_time).total_seconds()
                 logger.info(f"Completed {func.__name__} in {duration:.2f}s")
                 return result
             except Exception as e:
-                duration = (datetime.utcnow() - start_time).total_seconds()
+                duration = (get_utc_now() - start_time).total_seconds()
                 logger.error(f"Failed {func.__name__} after {duration:.2f}s: {str(e)}")
                 raise
 

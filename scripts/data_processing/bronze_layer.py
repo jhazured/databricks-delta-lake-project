@@ -1,7 +1,20 @@
 """Bronze layer data processing pipeline."""
 
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import warnings
+import sys
+
+
+def get_utc_now() -> datetime:
+    """Get current UTC datetime, compatible across Python versions."""
+    if sys.version_info >= (3, 11):
+        return datetime.now(timezone.utc)
+    else:
+        # Suppress deprecation warning for older Python versions
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            return datetime.utcnow()
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -89,7 +102,7 @@ class BronzeLayerProcessor:
             DataFrame with bronze layer metadata
         """
         # Add processing metadata
-        df["_bronze_ingestion_timestamp"] = datetime.utcnow()
+        df["_bronze_ingestion_timestamp"] = get_utc_now()
         df["_bronze_source"] = source
         df["_bronze_batch_id"] = self._generate_batch_id()
         df["_bronze_record_count"] = len(df)
@@ -98,7 +111,7 @@ class BronzeLayerProcessor:
 
     def _generate_batch_id(self) -> str:
         """Generate unique batch ID."""
-        return f"batch_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        return f"batch_{get_utc_now().strftime('%Y%m%d_%H%M%S')}"
 
     def _calculate_quality_metrics(self, df: pd.DataFrame) -> Dict[str, Any]:
         """Calculate data quality metrics.

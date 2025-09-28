@@ -1,6 +1,19 @@
 """FastAPI main application for Delta Lake project."""
 
-from datetime import datetime
+from datetime import datetime, timezone
+import warnings
+import sys
+
+
+def get_utc_now() -> datetime:
+    """Get current UTC datetime, compatible across Python versions."""
+    if sys.version_info >= (3, 11):
+        return datetime.now(timezone.utc)
+    else:
+        # Suppress deprecation warning for older Python versions
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            return datetime.utcnow()
 from typing import Any, Dict, List, Optional
 
 import uvicorn
@@ -104,7 +117,7 @@ async def delta_lake_error_handler(
         content=ErrorResponse(
             error=exc.__class__.__name__,
             message=exc.message,
-            timestamp=datetime.utcnow(),
+            timestamp=get_utc_now(),
         ).dict(),
     )
 
@@ -125,7 +138,7 @@ async def general_exception_handler(
         content=ErrorResponse(
             error="InternalServerError",
             message="An unexpected error occurred",
-            timestamp=datetime.utcnow(),
+            timestamp=get_utc_now(),
         ).dict(),
     )
 
@@ -138,7 +151,7 @@ async def health_check(
     """Health check endpoint."""
     return HealthResponse(
         status="healthy",
-        timestamp=datetime.utcnow(),
+        timestamp=get_utc_now(),
         version="1.0.0",
         environment=config.get("environment", "unknown"),
     )
@@ -251,7 +264,7 @@ async def get_metrics() -> Dict[str, Any]:
         "memory_usage": 67.8,
         "disk_usage": 23.1,
         "active_connections": 12,
-        "timestamp": datetime.utcnow(),
+        "timestamp": get_utc_now(),
     }
 
     return metrics
@@ -267,7 +280,7 @@ async def get_detailed_health() -> Dict[str, Any]:
             "databricks": {"status": "healthy", "response_time_ms": 250},
             "cache": {"status": "healthy", "response_time_ms": 5},
         },
-        "timestamp": datetime.utcnow(),
+        "timestamp": get_utc_now(),
     }
 
     return health_info
