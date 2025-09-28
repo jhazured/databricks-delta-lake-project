@@ -1,8 +1,8 @@
 """FastAPI main application for Delta Lake project."""
 
-from datetime import datetime, timezone
-import warnings
 import sys
+import warnings
+from datetime import datetime, timezone
 
 
 def get_utc_now() -> datetime:
@@ -14,6 +14,8 @@ def get_utc_now() -> datetime:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
             return datetime.utcnow()
+
+
 from typing import Any, Dict, List, Optional
 
 import uvicorn

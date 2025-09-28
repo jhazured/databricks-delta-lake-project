@@ -1,9 +1,9 @@
 """Bronze layer data processing pipeline."""
 
 import random
-from datetime import datetime, timedelta, timezone
-import warnings
 import sys
+import warnings
+from datetime import datetime, timedelta, timezone
 
 
 def get_utc_now() -> datetime:
@@ -15,6 +15,8 @@ def get_utc_now() -> datetime:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", DeprecationWarning)
             return datetime.utcnow()
+
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 

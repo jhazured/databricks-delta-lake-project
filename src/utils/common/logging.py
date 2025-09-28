@@ -3,10 +3,9 @@
 import json
 import logging
 import sys
-from datetime import datetime, timezone
 import warnings
+from datetime import datetime, timezone
 from typing import Any, Callable, Optional
-import sys
 
 
 def get_utc_now() -> datetime:
