@@ -43,23 +43,23 @@ We follow PEP 8 with some modifications:
 #### Code Formatting Tools
 ```bash
 # Format code with Black
-black utils/ scripts/ api/
+black src/ scripts/
 
 # Sort imports with isort
-isort utils/ scripts/ api/
+isort src/ scripts/
 
 # Check formatting
-black --check utils/ scripts/ api/
-isort --check-only utils/ scripts/ api/
+black --check src/ scripts/
+isort --check-only src/ scripts/
 ```
 
 #### Linting
 ```bash
 # Run flake8 linting
-flake8 utils/ scripts/ api/ --max-line-length=88 --max-complexity=10
+flake8 src/ scripts/ --max-line-length=88 --max-complexity=10
 
 # Type checking with mypy
-mypy utils/ scripts/ api/ --ignore-missing-imports
+mypy src/ scripts/ --ignore-missing-imports
 ```
 
 ### Documentation Standards

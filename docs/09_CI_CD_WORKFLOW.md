@@ -277,11 +277,11 @@ JAVA_VERSION: '11'       # Default Java version
 #### Code Quality Failures
 ```bash
 # Fix formatting
-black utils/ scripts/ api/
-isort utils/ scripts/ api/
+black src/ scripts/
+isort src/ scripts/
 
 # Fix linting
-flake8 utils/ scripts/ api/ --max-line-length=88
+flake8 src/ scripts/ --max-line-length=88
 ```
 
 #### Test Failures

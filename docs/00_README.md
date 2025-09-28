@@ -21,50 +21,53 @@ Welcome to the Databricks Delta Lake Project documentation. This directory conta
 ## 📚 Documentation Structure
 
 ### 🚀 Getting Started
-- **[TRIAL-SETUP-GUIDE.md](./TRIAL-SETUP-GUIDE.md)** - Quick start guide for Databricks trial users
-- **[COMPREHENSIVE-TODO.md](./COMPREHENSIVE-TODO.md)** - Complete project roadmap and task list
-
-### 🔄 CI/CD & DevOps
-- **[CI-CD-Workflow-Documentation.md](./CI-CD-Workflow-Documentation.md)** - Complete GitHub Actions workflow guide
-- **[CI-CD-Pipeline.md](./CI-CD-Pipeline.md)** - CI/CD pipeline overview and configuration
-- **[CI-CD-Quick-Reference.md](./CI-CD-Quick-Reference.md)** - Quick reference for developers
-- **[CI-CD-Pipeline-Diagram.txt](./CI-CD-Pipeline-Diagram.txt)** - ASCII diagram of pipeline flow
+- **[02_QUICK_START.md](./02_QUICK_START.md)** - Quick start guide for new users
+- **[03_SETUP.md](./03_SETUP.md)** - Complete setup instructions
+- **[18_TODO.md](./18_TODO.md)** - Comprehensive project roadmap and task list
 
 ### 🏗️ Architecture & Design
-- **[Project Architecture](./architecture/)** - System design and component overview
-- **[API Documentation](./api/)** - REST API specifications and examples
-- **[Data Pipeline Design](./data-pipelines/)** - ETL/ELT pipeline architecture
+- **[01_ARCHITECTURE.md](./01_ARCHITECTURE.md)** - System architecture and design
+- **[04_DATA_ARCHITECTURE.md](./04_DATA_ARCHITECTURE.md)** - Data lake and medallion architecture
+- **[05_API_DOCUMENTATION.md](./05_API_DOCUMENTATION.md)** - API specifications and examples
 
-### 🛠️ Setup & Configuration
-- **[Environment Setup](./setup/)** - Development environment configuration
-- **[Infrastructure Setup](./infrastructure/)** - Terraform and Kubernetes setup
-- **[Security Configuration](./security/)** - Security best practices and setup
+### 🤖 Machine Learning
+- **[06_ML_GUIDE.md](./06_ML_GUIDE.md)** - Machine learning workflows and MLOps
 
-### 📖 User Guides
-- **[User Manual](./user-guides/)** - End-user documentation
-- **[Developer Guide](./developer-guides/)** - Development workflow and standards
-  - **[Type Checking with mypy](./developer-guides/type-checking-with-mypy.md)** - Comprehensive mypy guide with error explanations
-  - **[Code Quality Standards](./developer-guides/code-quality-standards.md)** - Complete guide to all quality tools and checks
-- **[Operations Guide](./operations/)** - Deployment and maintenance procedures
+### 🛠️ Development & Operations
+- **[07_DEVELOPMENT_GUIDE.md](./07_DEVELOPMENT_GUIDE.md)** - Development workflow and standards
+- **[08_CODE_QUALITY_STANDARDS.md](./08_CODE_QUALITY_STANDARDS.md)** - Code quality tools and standards
+- **[09_CI_CD_WORKFLOW.md](./09_CI_CD_WORKFLOW.md)** - CI/CD pipeline documentation
+- **[10_DEPLOYMENT_GUIDE.md](./10_DEPLOYMENT_GUIDE.md)** - Deployment strategies and procedures
+- **[11_MONITORING.md](./11_MONITORING.md)** - Monitoring and observability
+- **[12_OPERATIONS.md](./12_OPERATIONS.md)** - Operational procedures and runbooks
+
+### 🔒 Security & Compliance
+- **[13_SECURITY.md](./13_SECURITY.md)** - Security policies and best practices
+
+### 📖 Support & Maintenance
+- **[14_TROUBLESHOOTING.md](./14_TROUBLESHOOTING.md)** - Common issues and solutions
+- **[15_CONTRIBUTING.md](./15_CONTRIBUTING.md)** - Contribution guidelines
+- **[16_CHANGELOG.md](./16_CHANGELOG.md)** - Version history and changes
+- **[17_ROADMAP.md](./17_ROADMAP.md)** - Future improvements and roadmap
 
 ## 🎯 Quick Navigation
 
 ### For New Users
-1. Start with [TRIAL-SETUP-GUIDE.md](./TRIAL-SETUP-GUIDE.md)
-2. Review [COMPREHENSIVE-TODO.md](./COMPREHENSIVE-TODO.md) for project overview
-3. Check [CI-CD-Quick-Reference.md](./CI-CD-Quick-Reference.md) for development workflow
+1. Start with [02_QUICK_START.md](./02_QUICK_START.md)
+2. Review [18_TODO.md](./18_TODO.md) for project overview
+3. Check [09_CI_CD_WORKFLOW.md](./09_CI_CD_WORKFLOW.md) for development workflow
 
 ### For Developers
-1. Read [CI-CD-Workflow-Documentation.md](./CI-CD-Workflow-Documentation.md) for CI/CD details
-2. Review [Project Architecture](./architecture/) for system design
-3. Check [Developer Guide](./developer-guides/) for coding standards
-4. Learn [Type Checking with mypy](./developer-guides/type-checking-with-mypy.md) for type safety
-5. Follow [Code Quality Standards](./developer-guides/code-quality-standards.md) for best practices
+1. Read [07_DEVELOPMENT_GUIDE.md](./07_DEVELOPMENT_GUIDE.md) for development workflow
+2. Review [08_CODE_QUALITY_STANDARDS.md](./08_CODE_QUALITY_STANDARDS.md) for quality standards
+3. Study [01_ARCHITECTURE.md](./01_ARCHITECTURE.md) for system design
+4. Check [04_DATA_ARCHITECTURE.md](./04_DATA_ARCHITECTURE.md) for data architecture
 
 ### For DevOps/Operations
-1. Study [CI-CD-Pipeline.md](./CI-CD-Pipeline.md) for pipeline configuration
-2. Review [Infrastructure Setup](./infrastructure/) for deployment
-3. Check [Operations Guide](./operations/) for maintenance procedures
+1. Study [09_CI_CD_WORKFLOW.md](./09_CI_CD_WORKFLOW.md) for pipeline configuration
+2. Review [10_DEPLOYMENT_GUIDE.md](./10_DEPLOYMENT_GUIDE.md) for deployment
+3. Check [12_OPERATIONS.md](./12_OPERATIONS.md) for maintenance procedures
+4. Monitor with [11_MONITORING.md](./11_MONITORING.md) for observability
 
 ## 📋 Documentation Standards
 

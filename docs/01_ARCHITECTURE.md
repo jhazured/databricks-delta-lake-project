@@ -82,7 +82,7 @@ graph TB
 ### 4. API Services
 - **Purpose**: Data and model serving
 - **Technology**: FastAPI, Python
-- **Location**: `api/main.py`
+- **Location**: `src/api/main.py`
 - **Features**:
   - RESTful API endpoints
   - Authentication and authorization

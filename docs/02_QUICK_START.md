@@ -74,7 +74,7 @@ data/
 
 #### **2. Basic ML Pipeline (Medium Priority)**
 ```
-ml/
+src/ml/
 ├── experiments/      # ML experiments
 ├── feature_store/    # Feature management
 └── model_registry/   # Model tracking
@@ -186,7 +186,7 @@ SAMPLE_DATA_SIZE=1000
 
 ### **Trial Python Utilities**
 
-Create `utils/trial_helpers.py`:
+Create `src/utils/trial_helpers.py`:
 
 ```python
 import os

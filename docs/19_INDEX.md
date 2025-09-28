@@ -9,13 +9,16 @@ This index provides direct links to all files in the repository for easy navigat
 - [pyproject.toml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/pyproject.toml) - Python project configuration and dependencies
 - [Dockerfile](https://github.com/jhazured/databricks-delta-lake-project/blob/main/Dockerfile) - Multi-stage Docker container configuration
 - [docker-compose.yml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/docker-compose.yml) - Docker Compose configuration for local development
-- [validate_yaml.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/validate_yaml.py) - YAML validation utility script
+- [src/utils/validate_yaml.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/src/utils/validate_yaml.py) - YAML validation utility script
 
 ### **🔧 GitHub Workflows & CI/CD**
 - [.github/workflows/ci.yml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/.github/workflows/ci.yml) - Comprehensive CI/CD pipeline with testing, security, and deployment
 
 ### **⚙️ Configuration Files**
-- [config/environments/dev.env.example](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/dev.env.example) - Development environment configuration template
+- [config/environments/dev.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/dev.env) - Development environment configuration
+- [config/environments/test.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/test.env) - Test environment configuration
+- [config/environments/uat.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/uat.env) - UAT environment configuration
+- [config/environments/prod.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/prod.env) - Production environment configuration
 
 ### **🏗️ Infrastructure as Code**
 
@@ -29,9 +32,10 @@ This index provides direct links to all files in the repository for easy navigat
 - [infrastructure/kubernetes/api-deployment.yaml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/kubernetes/api-deployment.yaml) - Kubernetes deployment configuration for API service
 
 ### **🔌 API Layer**
-- [api/main.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/api/main.py) - FastAPI application entry point and main API implementation
+- [src/api/main.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/src/api/main.py) - FastAPI application entry point and main API implementation
 
 ### **🛠️ Scripts & Data Processing**
+- [scripts/run_ci_checks.sh](https://github.com/jhazured/databricks-delta-lake-project/blob/main/scripts/run_ci_checks.sh) - Local CI checks script
 - [scripts/data_processing/bronze_layer.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/scripts/data_processing/bronze_layer.py) - Bronze layer data processing and ETL pipeline implementation
 
 ### **🧪 Testing Suite**

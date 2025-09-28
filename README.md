@@ -13,7 +13,7 @@ This repository contains a **production-ready, enterprise-grade data lake platfo
 
 ### **🏗️ Architecture Excellence**
 - **Medallion Architecture**: Bronze-Silver-Gold data lake design
-- **Multi-Environment Support**: Dev, Staging, Production with environment isolation
+- **Multi-Environment Support**: Dev, Test, UAT, Production with environment isolation
 - **Scalable Infrastructure**: Auto-scaling compute and storage
 - **High Availability**: Multi-region deployment with disaster recovery
 
@@ -60,143 +60,94 @@ This repository contains a **production-ready, enterprise-grade data lake platfo
 
 ```
 databricks-delta-lake-project/
-├── 📄 LICENSE                                    # MIT License
 ├── 📄 README.md                                  # This overview
-├── 📄 CHANGELOG.md                               # Version history
-├── 📄 CONTRIBUTING.md                            # Contribution guidelines
-├── 📄 SECURITY.md                                # Security policy
-├── 📄 CODE_OF_CONDUCT.md                         # Code of conduct
-├── 📄 GOVERNANCE.md                              # Project governance
 ├── 📄 requirements.txt                           # Python dependencies
-├── 📄 databricks-requirements.txt                # Databricks-specific packages
 ├── 📄 pyproject.toml                             # Python project configuration
-├── 📄 .pre-commit-config.yaml                    # Pre-commit hooks
 ├── 📄 .gitignore                                 # Git ignore rules
+├── 📄 pylintrc                                   # Linting configuration
+├── 📄 docker-compose.yml                         # Container orchestration
+├── 📄 Dockerfile                                 # Container definition
+├── 📄 output.yaml                                # Output configuration
 │
 ├── 📁 .github/                                   # GitHub workflows and templates
-│   ├── 📁 workflows/                            # CI/CD pipelines
-│   ├── 📁 ISSUE_TEMPLATE/                       # Issue templates
-│   ├── 📁 PULL_REQUEST_TEMPLATE/                # PR templates
-│   └── 📁 SECURITY.md                           # Security policy
+│   └── 📁 workflows/                            # CI/CD pipelines
 │
 ├── 📁 config/                                    # Configuration management
-│   ├── 📁 environments/                         # Environment-specific configs
-│   ├── 📁 secrets/                              # Secret management
-│   ├── 📁 feature_flags/                        # Feature flag configurations
-│   └── 📁 parameters/                           # System parameters
+│   └── 📁 environments/                         # Environment-specific configs
+│       ├── 📄 dev.env                           # Development environment
+│       ├── 📄 test.env                          # Test environment
+│       ├── 📄 uat.env                           # User Acceptance Testing
+│       └── 📄 prod.env                          # Production environment
 │
-├── 📁 deployment/                                # Deployment strategies and automation
-│   ├── 📁 environments/                         # Environment configurations
-│   ├── 📁 strategies/                           # Deployment strategies
-│   ├── 📁 rollback/                             # Rollback procedures
-│   └── 📁 validation/                           # Deployment validation
+├── 📁 docs/                                      # Comprehensive documentation
+│   ├── 📄 00_README.md                          # Project overview
+│   ├── 📄 01_ARCHITECTURE.md                    # System architecture
+│   ├── 📄 02_QUICK_START.md                     # Getting started
+│   ├── 📄 03_SETUP.md                           # Setup instructions
+│   ├── 📄 04_DATA_ARCHITECTURE.md               # Data lake architecture
+│   ├── 📄 05_API_DOCUMENTATION.md               # API reference
+│   ├── 📄 06_ML_GUIDE.md                        # Machine learning guide
+│   ├── 📄 07_DEVELOPMENT_GUIDE.md               # Development workflow
+│   ├── 📄 08_CODE_QUALITY_STANDARDS.md          # Code standards
+│   ├── 📄 09_CI_CD_WORKFLOW.md                  # CI/CD processes
+│   ├── 📄 10_DEPLOYMENT_GUIDE.md                # Deployment guide
+│   ├── 📄 11_MONITORING.md                      # Monitoring guide
+│   ├── 📄 12_OPERATIONS.md                      # Operational procedures
+│   ├── 📄 13_SECURITY.md                        # Security policies
+│   ├── 📄 14_TROUBLESHOOTING.md                 # Troubleshooting
+│   ├── 📄 15_CONTRIBUTING.md                    # Contribution guidelines
+│   ├── 📄 16_CHANGELOG.md                       # Change history
+│   ├── 📄 17_ROADMAP.md                         # Improvement roadmap
+│   ├── 📄 18_TODO.md                            # Comprehensive TODO
+│   └── 📄 19_INDEX.md                           # Navigation index
+│
+├── 📁 src/                                       # Source code
+│   ├── 📁 analytics/                            # Business intelligence & reporting
+│   ├── 📁 api/                                  # API endpoints & services
+│   ├── 📁 integration/                          # Data integration (ETL/ELT)
+│   ├── 📁 ml/                                   # Machine learning
+│   └── 📁 utils/                                # Utility functions
+│       ├── 📁 common/                           # Common utilities
+│       ├── 📁 databricks/                       # Databricks-specific utilities
+│       └── 📄 validate_yaml.py                  # YAML validation utility
+│
+├── 📁 scripts/                                   # All operational scripts
+│   ├── 📁 automation/                           # CI/CD and automation
+│   ├── 📁 data_processing/                      # Data processing scripts
+│   ├── 📁 governance/                           # Data governance procedures
+│   ├── 📁 maintenance/                          # System maintenance
+│   ├── 📁 monitoring/                           # Observability and alerting
+│   ├── 📁 playbooks/                            # Operational playbooks
+│   ├── 📁 runbooks/                             # Operational runbooks
+│   ├── 📁 security/                             # Security procedures
+│   ├── 📁 setup/                                # Installation and configuration
+│   ├── 📁 utilities/                            # General utility scripts
+│   └── 📄 run_ci_checks.sh                      # CI checks script
+│
+├── 📁 data/                                      # Data lake layers
+│   ├── 📁 bronze/                               # Raw data layer (landing zone)
+│   ├── 📁 silver/                               # Cleaned data layer
+│   └── 📁 gold/                                 # Business-ready data layer
 │
 ├── 📁 infrastructure/                            # Infrastructure as Code
 │   ├── 📁 terraform/                            # Terraform configurations
 │   ├── 📁 ansible/                              # Ansible playbooks
 │   ├── 📁 docker/                               # Docker configurations
-│   └── 📁 kubernetes/                           # Kubernetes manifests
+│   ├── 📁 kubernetes/                           # Kubernetes manifests
+│   └── 📁 deployment/                           # Deployment strategies
 │
-├── 📁 operations/                                # Operational excellence
-│   ├── 📁 runbooks/                             # Operational runbooks
-│   ├── 📁 playbooks/                            # Incident response playbooks
-│   ├── 📁 incident_response/                    # Incident management
-│   └── 📁 capacity_planning/                    # Capacity planning
-│
-├── 📁 security/                                  # Security and compliance
-│   ├── 📁 policies/                             # Security policies
-│   ├── 📁 compliance/                           # Compliance frameworks
-│   ├── 📁 audit/                                # Audit procedures
-│   └── 📁 access_control/                       # Access control management
-│
-├── 📁 governance/                                # Data governance
-│   ├── 📁 data_catalog/                         # Data catalog management
-│   ├── 📁 lineage/                              # Data lineage tracking
-│   ├── 📁 quality/                              # Data quality management
-│   └── 📁 privacy/                              # Privacy and data protection
-│
-├── 📁 monitoring/                                # Observability and monitoring
-│   ├── 📁 observability/                        # Observability stack
-│   ├── 📁 alerting/                             # Alerting configurations
-│   ├── 📁 metrics/                              # Metrics collection
-│   └── 📁 logs/                                 # Log management
-│
-├── 📁 testing/                                   # Comprehensive testing framework
+├── 📁 testing/                                   # Testing and quality assurance
 │   ├── 📁 unit/                                 # Unit tests
 │   ├── 📁 integration/                          # Integration tests
 │   ├── 📁 e2e/                                  # End-to-end tests
 │   ├── 📁 performance/                          # Performance tests
-│   └── 📁 security/                             # Security tests
+│   ├── 📁 security/                             # Security tests
+│   └── 📁 htmlcov/                              # Coverage reports
 │
-├── 📁 data/                                      # Data layer management
-│   ├── 📁 bronze/                               # Raw data layer
-│   │   ├── 📁 schemas/                          # Schema definitions
-│   │   ├── 📁 ddl/                              # DDL scripts
-│   │   ├── 📁 validation/                       # Data validation
-│   │   └── 📁 monitoring/                       # Data monitoring
-│   ├── 📁 silver/                               # Cleaned data layer
-│   │   ├── 📁 schemas/                          # Schema definitions
-│   │   ├── 📁 ddl/                              # DDL scripts
-│   │   ├── 📁 validation/                       # Data validation
-│   │   └── 📁 monitoring/                       # Data monitoring
-│   ├── 📁 gold/                                 # Business data layer
-│   │   ├── 📁 schemas/                          # Schema definitions
-│   │   ├── 📁 ddl/                              # DDL scripts
-│   │   ├── 📁 validation/                       # Data validation
-│   │   └── 📁 monitoring/                       # Data monitoring
-│   ├── 📁 staging/                              # Staging environment
-│   └── 📁 archive/                              # Data archival
+├── 📁 output/                                    # Pipeline outputs
+│   └── 📁 medallion_pipeline/                   # Medallion pipeline outputs
 │
-├── 📁 ml/                                        # Machine Learning platform
-│   ├── 📁 feature_store/                        # Feature Store management
-│   ├── 📁 model_registry/                       # Model registry
-│   ├── 📁 experiments/                          # ML experiments
-│   ├── 📁 serving/                              # Model serving
-│   └── 📁 monitoring/                           # ML monitoring
-│
-├── 📁 analytics/                                 # Analytics and reporting
-│   ├── 📁 dashboards/                           # Business dashboards
-│   ├── 📁 reports/                              # Automated reports
-│   ├── 📁 kpis/                                 # KPI definitions
-│   └── 📁 alerts/                               # Business alerts
-│
-├── 📁 api/                                       # API management
-│   ├── 📁 rest/                                 # REST API
-│   ├── 📁 graphql/                              # GraphQL API
-│   ├── 📁 streaming/                            # Streaming API
-│   └── 📁 webhooks/                             # Webhook management
-│
-├── 📁 integration/                               # Data integration
-│   ├── 📁 etl/                                  # ETL processes
-│   ├── 📁 elt/                                  # ELT processes
-│   ├── 📁 streaming/                            # Streaming integration
-│   └── 📁 real_time/                            # Real-time integration
-│
-├── 📁 automation/                                # Automation framework
-│   ├── 📁 ci_cd/                                # CI/CD pipelines
-│   ├── 📁 deployment/                           # Deployment automation
-│   ├── 📁 orchestration/                        # Workflow orchestration
-│   └── 📁 remediation/                          # Automated remediation
-│
-├── 📁 documentation/                             # Comprehensive documentation
-│   ├── 📁 architecture/                         # Architecture documentation
-│   ├── 📁 api/                                  # API documentation
-│   ├── 📁 user_guides/                          # User guides
-│   ├── 📁 admin_guides/                         # Administrator guides
-│   └── 📁 runbooks/                             # Operational runbooks
-│
-├── 📁 scripts/                                   # Utility scripts
-│   ├── 📁 setup/                                # Setup scripts
-│   ├── 📁 maintenance/                          # Maintenance scripts
-│   ├── 📁 backup/                               # Backup scripts
-│   ├── 📁 recovery/                             # Recovery scripts
-│   └── 📁 utilities/                            # Utility scripts
-│
-└── 📁 utils/                                     # Utility modules
-    ├── 📁 common/                               # Common utilities
-    ├── 📁 databricks/                           # Databricks utilities
-    ├── 📁 ml/                                   # ML utilities
-    └── 📁 monitoring/                           # Monitoring utilities
+└── 📁 venv/                                      # Virtual environment
 ```
 
 ## 🚀 Quick Start
