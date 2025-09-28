@@ -5,96 +5,96 @@ This index provides direct links to all files in the repository for easy navigat
 ## 📁 Repository Structure & File Links
 
 ### **📄 Root Level Files**
-- [README.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/README.md) - Main project documentation and overview
-- [pyproject.toml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/pyproject.toml) - Python project configuration and dependencies
-- [Dockerfile](https://github.com/jhazured/databricks-delta-lake-project/blob/main/Dockerfile) - Multi-stage Docker container configuration
-- [docker-compose.yml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/docker-compose.yml) - Docker Compose configuration for local development
-- [src/utils/validate_yaml.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/src/utils/validate_yaml.py) - YAML validation utility script
+- [README.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/README.md) - Main project documentation and overview
+- [pyproject.toml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/pyproject.toml) - Python project configuration and dependencies
+- [Dockerfile](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/Dockerfile) - Multi-stage Docker container configuration
+- [docker-compose.yml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/docker-compose.yml) - Docker Compose configuration for local development
+- [src/utils/validate_yaml.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/src/utils/validate_yaml.py) - YAML validation utility script
 
 ### **🔧 GitHub Workflows & CI/CD**
-- [.github/workflows/ci.yml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/.github/workflows/ci.yml) - Comprehensive CI/CD pipeline with testing, security, and deployment
+- [.github/workflows/ci.yml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/.github/workflows/ci.yml) - Comprehensive CI/CD pipeline with testing, security, and deployment
 
 ### **⚙️ Configuration Files**
-- [config/environments/dev.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/dev.env) - Development environment configuration
-- [config/environments/test.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/test.env) - Test environment configuration
-- [config/environments/uat.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/uat.env) - UAT environment configuration
-- [config/environments/prod.env](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/prod.env) - Production environment configuration
+- [config/environments/dev.env](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/config/environments/dev.env) - Development environment configuration
+- [config/environments/test.env](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/config/environments/test.env) - Test environment configuration
+- [config/environments/uat.env](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/config/environments/uat.env) - UAT environment configuration
+- [config/environments/prod.env](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/config/environments/prod.env) - Production environment configuration
 
 ### **🏗️ Infrastructure as Code**
 
 #### **Terraform**
-- [infrastructure/terraform/main.tf](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/terraform/main.tf) - Main Terraform infrastructure configuration
+- [infrastructure/terraform/main.tf](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/infrastructure/terraform/main.tf) - Main Terraform infrastructure configuration
 
 #### **Kubernetes**
-- [infrastructure/kubernetes/namespace.yaml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/kubernetes/namespace.yaml) - Kubernetes namespace configuration
-- [infrastructure/kubernetes/configmap.yaml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/kubernetes/configmap.yaml) - Kubernetes ConfigMap for application configuration
-- [infrastructure/kubernetes/secret.yaml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/kubernetes/secret.yaml) - Kubernetes Secret template for sensitive data
-- [infrastructure/kubernetes/api-deployment.yaml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/kubernetes/api-deployment.yaml) - Kubernetes deployment configuration for API service
+- [infrastructure/kubernetes/namespace.yaml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/infrastructure/kubernetes/namespace.yaml) - Kubernetes namespace configuration
+- [infrastructure/kubernetes/configmap.yaml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/infrastructure/kubernetes/configmap.yaml) - Kubernetes ConfigMap for application configuration
+- [infrastructure/kubernetes/secret.yaml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/infrastructure/kubernetes/secret.yaml) - Kubernetes Secret template for sensitive data
+- [infrastructure/kubernetes/api-deployment.yaml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/infrastructure/kubernetes/api-deployment.yaml) - Kubernetes deployment configuration for API service
 
 ### **🔌 API Layer**
-- [src/api/main.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/src/api/main.py) - FastAPI application entry point and main API implementation
+- [src/api/main.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/src/api/main.py) - FastAPI application entry point and main API implementation
 
 ### **🛠️ Scripts & Data Processing**
-- [scripts/run_ci_checks.sh](https://github.com/jhazured/databricks-delta-lake-project/blob/main/scripts/run_ci_checks.sh) - Local CI checks script
-- [scripts/data_processing/bronze_layer.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/scripts/data_processing/bronze_layer.py) - Bronze layer data processing and ETL pipeline implementation
+- [scripts/run_ci_checks.sh](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/scripts/run_ci_checks.sh) - Local CI checks script
+- [scripts/data_processing/bronze_layer.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/scripts/data_processing/bronze_layer.py) - Bronze layer data processing and ETL pipeline implementation
 
 ### **🧪 Testing Suite**
 
 #### **Unit Tests**
-- [testing/unit/test_common_utils.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/testing/unit/test_common_utils.py) - Unit tests for common utilities and helper functions
+- [testing/unit/test_common_utils.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/testing/unit/test_common_utils.py) - Unit tests for common utilities and helper functions
 
 #### **Integration Tests**
-- [testing/integration/test_databricks_integration.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/testing/integration/test_databricks_integration.py) - Integration tests for Databricks functionality with mocked services
+- [testing/integration/test_databricks_integration.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/testing/integration/test_databricks_integration.py) - Integration tests for Databricks functionality with mocked services
 
 #### **Performance Tests**
-- [testing/performance/test_performance.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/testing/performance/test_performance.py) - Performance benchmarks and load testing
+- [testing/performance/test_performance.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/testing/performance/test_performance.py) - Performance benchmarks and load testing
 
 ### **🔧 Utilities & Common Libraries**
 
 #### **Core Utilities**
-- [utils/__init__.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/utils/__init__.py) - Utilities package initialization
-- [utils/common/config.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/utils/common/config.py) - Configuration management utilities
-- [utils/common/exceptions.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/utils/common/exceptions.py) - Custom exception classes and error handling
-- [utils/common/logging.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/utils/common/logging.py) - Structured logging utilities and configuration
-- [utils/common/validation.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/utils/common/validation.py) - Data validation and schema validation utilities
+- [utils/__init__.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/utils/__init__.py) - Utilities package initialization
+- [utils/common/config.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/utils/common/config.py) - Configuration management utilities
+- [utils/common/exceptions.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/utils/common/exceptions.py) - Custom exception classes and error handling
+- [utils/common/logging.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/utils/common/logging.py) - Structured logging utilities and configuration
+- [utils/common/validation.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/utils/common/validation.py) - Data validation and schema validation utilities
 
 #### **Databricks Integration**
-- [utils/databricks/connection.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/utils/databricks/connection.py) - Databricks connection management and API utilities
+- [utils/databricks/connection.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/utils/databricks/connection.py) - Databricks connection management and API utilities
 
 ### **📚 Documentation**
 
 #### **Main Documentation**
-- [documentation/README.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/README.md) - Documentation overview and navigation guide
-- [documentation/INDEX.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/INDEX.md) - This file - comprehensive file index
+- [documentation/README.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/README.md) - Documentation overview and navigation guide
+- [documentation/INDEX.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/INDEX.md) - This file - comprehensive file index
 
 #### **Project Management**
-- [documentation/CHANGELOG.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CHANGELOG.md) - Version history and release notes
-- [documentation/CONTRIBUTING.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CONTRIBUTING.md) - Contribution guidelines and development standards
-- [documentation/COMPREHENSIVE-TODO.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/COMPREHENSIVE-TODO.md) - Comprehensive project task list and roadmap
+- [documentation/CHANGELOG.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CHANGELOG.md) - Version history and release notes
+- [documentation/CONTRIBUTING.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CONTRIBUTING.md) - Contribution guidelines and development standards
+- [documentation/COMPREHENSIVE-TODO.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/COMPREHENSIVE-TODO.md) - Comprehensive project task list and roadmap
 
 #### **Security & Compliance**
-- [documentation/SECURITY.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/SECURITY.md) - Security policy and vulnerability reporting procedures
-- [documentation/security/data_classification_policy.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/security/data_classification_policy.md) - Data classification and handling policies
+- [documentation/SECURITY.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/SECURITY.md) - Security policy and vulnerability reporting procedures
+- [documentation/security/data_classification_policy.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/security/data_classification_policy.md) - Data classification and handling policies
 
 #### **CI/CD & Operations**
-- [documentation/CI-CD-Quick-Reference.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CI-CD-Quick-Reference.md) - Quick reference guide for CI/CD pipeline
-- [documentation/CI-CD-Workflow-Documentation.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CI-CD-Workflow-Documentation.md) - Detailed CI/CD workflow documentation
-- [documentation/operations/incident_response.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/operations/incident_response.md) - Incident response procedures and runbooks
+- [documentation/CI-CD-Quick-Reference.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CI-CD-Quick-Reference.md) - Quick reference guide for CI/CD pipeline
+- [documentation/CI-CD-Workflow-Documentation.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CI-CD-Workflow-Documentation.md) - Detailed CI/CD workflow documentation
+- [documentation/operations/incident_response.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/operations/incident_response.md) - Incident response procedures and runbooks
 
 #### **Setup & Getting Started**
-- [documentation/TRIAL-SETUP-GUIDE.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/TRIAL-SETUP-GUIDE.md) - Trial setup and quick start guide
+- [documentation/TRIAL-SETUP-GUIDE.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/TRIAL-SETUP-GUIDE.md) - Trial setup and quick start guide
 
 #### **API Documentation**
-- [documentation/api/api-documentation.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/api/api-documentation.md) - Comprehensive API documentation and endpoints
+- [documentation/api/api-documentation.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/api/api-documentation.md) - Comprehensive API documentation and endpoints
 
 #### **Architecture Documentation**
-- [documentation/architecture/system-overview.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/architecture/system-overview.md) - System architecture overview and design decisions
+- [documentation/architecture/system-overview.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/architecture/system-overview.md) - System architecture overview and design decisions
 
 #### **Developer Guides**
-- [documentation/developer-guides/development-workflow.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/developer-guides/development-workflow.md) - Development workflow and best practices
-- [documentation/developer-guides/code-quality-standards.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/developer-guides/code-quality-standards.md) - Code quality standards and guidelines
-- [documentation/developer-guides/code-formatting-tools.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/developer-guides/code-formatting-tools.md) - Code formatting tools and configuration
-- [documentation/developer-guides/type-checking-with-mypy.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/developer-guides/type-checking-with-mypy.md) - Type checking setup and usage with MyPy
+- [documentation/developer-guides/development-workflow.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/developer-guides/development-workflow.md) - Development workflow and best practices
+- [documentation/developer-guides/code-quality-standards.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/developer-guides/code-quality-standards.md) - Code quality standards and guidelines
+- [documentation/developer-guides/code-formatting-tools.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/developer-guides/code-formatting-tools.md) - Code formatting tools and configuration
+- [documentation/developer-guides/type-checking-with-mypy.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/developer-guides/type-checking-with-mypy.md) - Type checking setup and usage with MyPy
 
 ## 📂 Directory Structure Overview
 
@@ -303,39 +303,39 @@ utils/
 ## 🔗 Quick Access Links
 
 ### **🚀 Getting Started**
-- [README.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/README.md) - Start here for project overview
-- [documentation/TRIAL-SETUP-GUIDE.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/TRIAL-SETUP-GUIDE.md) - Quick start and trial setup
-- [config/environments/dev.env.example](https://github.com/jhazured/databricks-delta-lake-project/blob/main/config/environments/dev.env.example) - Environment configuration template
+- [README.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/README.md) - Start here for project overview
+- [documentation/TRIAL-SETUP-GUIDE.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/TRIAL-SETUP-GUIDE.md) - Quick start and trial setup
+- [config/environments/dev.env.example](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/config/environments/dev.env.example) - Environment configuration template
 
 ### **🏗️ Infrastructure & Deployment**
-- [infrastructure/terraform/main.tf](https://github.com/jhazured/databricks-delta-lake-project/blob/main/infrastructure/terraform/main.tf) - Infrastructure as Code
+- [infrastructure/terraform/main.tf](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/infrastructure/terraform/main.tf) - Infrastructure as Code
 - [infrastructure/kubernetes/](https://github.com/jhazured/databricks-delta-lake-project/tree/main/infrastructure/kubernetes) - Kubernetes configurations
-- [.github/workflows/ci.yml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/.github/workflows/ci.yml) - CI/CD Pipeline
-- [Dockerfile](https://github.com/jhazured/databricks-delta-lake-project/blob/main/Dockerfile) - Container configuration
+- [.github/workflows/ci.yml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/.github/workflows/ci.yml) - CI/CD Pipeline
+- [Dockerfile](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/Dockerfile) - Container configuration
 
 ### **🔒 Security & Compliance**
-- [documentation/SECURITY.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/SECURITY.md) - Security policy
-- [documentation/security/data_classification_policy.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/security/data_classification_policy.md) - Data classification policy
+- [documentation/SECURITY.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/SECURITY.md) - Security policy
+- [documentation/security/data_classification_policy.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/security/data_classification_policy.md) - Data classification policy
 
 ### **🔧 Operations & Monitoring**
-- [documentation/operations/incident_response.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/operations/incident_response.md) - Incident response procedures
-- [documentation/CI-CD-Quick-Reference.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CI-CD-Quick-Reference.md) - CI/CD quick reference
+- [documentation/operations/incident_response.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/operations/incident_response.md) - Incident response procedures
+- [documentation/CI-CD-Quick-Reference.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CI-CD-Quick-Reference.md) - CI/CD quick reference
 
 ### **📊 Development & Testing**
-- [documentation/developer-guides/development-workflow.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/developer-guides/development-workflow.md) - Development workflow
+- [documentation/developer-guides/development-workflow.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/developer-guides/development-workflow.md) - Development workflow
 - [testing/](https://github.com/jhazured/databricks-delta-lake-project/tree/main/testing) - Test suite (unit, integration, performance)
-- [pyproject.toml](https://github.com/jhazured/databricks-delta-lake-project/blob/main/pyproject.toml) - Project configuration and dependencies
+- [pyproject.toml](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/pyproject.toml) - Project configuration and dependencies
 
 ### **📚 API & Documentation**
-- [api/main.py](https://github.com/jhazured/databricks-delta-lake-project/blob/main/api/main.py) - API implementation
-- [documentation/api/api-documentation.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/api/api-documentation.md) - API documentation
-- [documentation/architecture/system-overview.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/architecture/system-overview.md) - System architecture
+- [api/main.py](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/api/main.py) - API implementation
+- [documentation/api/api-documentation.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/api/api-documentation.md) - API documentation
+- [documentation/architecture/system-overview.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/architecture/system-overview.md) - System architecture
 
 ### **📊 Project Management**
-- [documentation/CHANGELOG.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CHANGELOG.md) - Version history
-- [documentation/COMPREHENSIVE-TODO.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/COMPREHENSIVE-TODO.md) - Project roadmap and tasks
-- [documentation/IMPROVEMENT-ROADMAP.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/IMPROVEMENT-ROADMAP.md) - Comprehensive improvement roadmap and implementation plan
-- [documentation/CONTRIBUTING.md](https://github.com/jhazured/databricks-delta-lake-project/blob/main/documentation/CONTRIBUTING.md) - Contribution guidelines
+- [documentation/CHANGELOG.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CHANGELOG.md) - Version history
+- [documentation/COMPREHENSIVE-TODO.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/COMPREHENSIVE-TODO.md) - Project roadmap and tasks
+- [documentation/IMPROVEMENT-ROADMAP.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/IMPROVEMENT-ROADMAP.md) - Comprehensive improvement roadmap and implementation plan
+- [documentation/CONTRIBUTING.md](https://raw.githubusercontent.com/jhazured/databricks-delta-lake-project/main/documentation/CONTRIBUTING.md) - Contribution guidelines
 
 ## 📝 File Types Overview
 
