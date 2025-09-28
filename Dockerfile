@@ -65,11 +65,16 @@ CMD ["python", "scripts/main.py"]
 # Stage 4: API service
 FROM python:3.11-slim AS api
 
+# Build arguments for environment configuration
+ARG ENV_FILE=example.env
+ARG ENVIRONMENT=dev
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    ENVIRONMENT=${ENVIRONMENT}
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -85,7 +90,10 @@ RUN pip install --no-cache-dir -r requirements-api.txt
 
 # Copy source code
 COPY src/ ./src/
-COPY config/environments/ ./config/environments/
+
+# Create config directory structure and copy specified environment file
+RUN mkdir -p ./config/environments
+COPY config/environments/${ENV_FILE} ./config/environments/
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \
@@ -105,13 +113,23 @@ CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 # Stage 5: Data processing service
 FROM base AS data-processing
 
+# Build arguments for environment configuration
+ARG ENV_FILE=example.env
+ARG ENVIRONMENT=dev
+
+# Set environment variable
+ENV ENVIRONMENT=${ENVIRONMENT}
+
 # Install additional data processing dependencies
 RUN pip install --no-cache-dir pandas numpy scikit-learn
 
 # Copy data processing code
 COPY scripts/ ./scripts/
 COPY src/ ./src/
-COPY config/environments/ ./config/environments/
+
+# Create config directory structure and copy specified environment file
+RUN mkdir -p ./config/environments
+COPY config/environments/${ENV_FILE} ./config/environments/
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app && \
