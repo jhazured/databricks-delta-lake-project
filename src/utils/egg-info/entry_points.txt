@@ -1,0 +1,4 @@
+[console_scripts]
+delta-deploy = scripts.deployment:main
+delta-monitor = scripts.monitoring:main
+delta-test = scripts.testing:main

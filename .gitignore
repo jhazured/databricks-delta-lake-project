@@ -3,6 +3,14 @@
 .env.local
 .env.*.local
 
+# Environment configuration files (keep templates, ignore actual configs)
+config/environments/*.env
+!config/environments/*.env.example
+config/environments/dev.local.env
+config/environments/test.local.env
+config/environments/uat.local.env
+config/environments/prod.local.env
+
 # Python
 __pycache__/
 *.py[cod]

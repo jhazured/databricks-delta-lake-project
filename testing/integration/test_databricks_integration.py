@@ -6,9 +6,9 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 from typing import Dict, Any
 
-from utils.databricks.connection import DatabricksConnection, DatabricksConfig
+from src.utils.databricks.connection import DatabricksConnection, DatabricksConfig
 from scripts.data_processing.bronze_layer import BronzeLayerProcessor, SampleDataGenerator
-from utils.common.validation import SchemaValidator
+from src.utils.common.validation import SchemaValidator
 
 
 class TestDatabricksIntegration:

@@ -17,7 +17,7 @@ from scripts.data_processing.gold_layer import (
     GoldLayerProcessor, BusinessMetricsProcessor, AggregationProcessor,
     MLFeatureProcessor, ReportingProcessor, AggregationLevel, BusinessMetricType, BusinessMetric
 )
-from utils.common.exceptions import DataProcessingError
+from src.utils.common.exceptions import DataProcessingError
 
 
 class TestDataCleaningProcessor:

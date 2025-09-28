@@ -19,7 +19,7 @@ from scripts.data_processing.bronze_layer import (
 )
 from scripts.data_processing.gold_layer import AggregationLevel, GoldLayerProcessor
 from scripts.data_processing.silver_layer import SilverLayerProcessor
-from utils.common.exceptions import DataProcessingError
+from src.utils.common.exceptions import DataProcessingError
 
 
 class MedallionPipeline:

@@ -6,10 +6,10 @@ import pytest
 import tempfile
 import os
 from unittest.mock import patch, mock_open
-from utils.common.config import ConfigManager, AppConfig, Environment, load_config
-from utils.common.validation import DataValidator, SchemaValidator, validate_email, validate_phone
-from utils.common.exceptions import ValidationError, ConfigurationError
-from utils.common.logging import setup_logging, StructuredLogger
+from src.utils.common.config import ConfigManager, AppConfig, Environment, load_config
+from src.utils.common.validation import DataValidator, SchemaValidator, validate_email, validate_phone
+from src.utils.common.exceptions import ValidationError, ConfigurationError
+from src.utils.common.logging import setup_logging, StructuredLogger
 
 
 class TestConfigManager:

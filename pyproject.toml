@@ -99,7 +99,7 @@ delta-test = "scripts.testing:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["scripts*", "utils*"]
+include = ["scripts*", "src*"]
 exclude = ["tests*", "docs*"]
 
 [tool.black]
@@ -124,7 +124,7 @@ extend-exclude = '''
 profile = "black"
 multi_line_output = 3
 line_length = 88
-known_first_party = ["scripts", "utils"]
+known_first_party = ["scripts", "src"]
 known_third_party = ["databricks", "pyspark", "mlflow", "pandas", "numpy"]
 
 [tool.mypy]
@@ -185,7 +185,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["scripts", "utils"]
+source = ["scripts", "src"]
 omit = [
     "*/tests/*",
     "*/test_*",

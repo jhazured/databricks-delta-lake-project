@@ -14,8 +14,8 @@ from typing import Any, Dict, Optional
 import numpy as np
 import pandas as pd
 
-from utils.common.exceptions import DataProcessingError
-from utils.common.validation import DataValidator, SchemaValidator
+from src.utils.common.exceptions import DataProcessingError
+from src.utils.common.validation import DataValidator, SchemaValidator
 
 
 class DataQualityLevel(Enum):
