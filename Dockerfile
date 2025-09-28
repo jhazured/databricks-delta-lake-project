@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Databricks Delta Lake Project
 
 # Stage 1: Base Python environment
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -28,7 +28,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -e .
 
 # Stage 2: Development environment
-FROM base as development
+FROM base AS development
 
 # Install development dependencies
 RUN pip install --no-cache-dir pytest pytest-cov black flake8 mypy isort
@@ -45,7 +45,7 @@ USER app
 CMD ["python", "-m", "pytest", "testing/", "-v"]
 
 # Stage 3: Production environment
-FROM base as production
+FROM base AS production
 
 # Copy source code
 COPY . .
@@ -57,20 +57,34 @@ USER app
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD python -c "import utils.common; print('Health check passed')" || exit 1
+    CMD python -c "import src.utils.common; print('Health check passed')" || exit 1
 
 # Default command for production
 CMD ["python", "scripts/main.py"]
 
 # Stage 4: API service
-FROM base as api
+FROM python:3.11-slim AS api
 
-# Install API dependencies
-RUN pip install --no-cache-dir fastapi uvicorn[standard] pydantic
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Copy API code
-COPY api/ ./api/
-COPY utils/ ./utils/
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy and install lightweight API dependencies
+COPY requirements-api.txt .
+RUN pip install --no-cache-dir -r requirements-api.txt
+
+# Copy source code
+COPY src/ ./src/
 COPY config/ ./config/
 
 # Create non-root user
@@ -86,17 +100,17 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Default command for API
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # Stage 5: Data processing service
-FROM base as data-processing
+FROM base AS data-processing
 
 # Install additional data processing dependencies
 RUN pip install --no-cache-dir pandas numpy scikit-learn
 
 # Copy data processing code
 COPY scripts/ ./scripts/
-COPY utils/ ./utils/
+COPY src/ ./src/
 COPY config/ ./config/
 
 # Create non-root user

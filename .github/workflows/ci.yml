@@ -243,11 +243,11 @@ jobs:
     
     - name: Test development image
       run: |
-        docker run --rm delta-lake-dev:latest python -c "import utils.common; print('Import successful')"
+        docker run --rm delta-lake-dev:latest python -c "import src.utils.common; print('Import successful')"
     
     - name: Test production image
       run: |
-        docker run --rm delta-lake-prod:latest python -c "import utils.common; print('Import successful')"
+        docker run --rm delta-lake-prod:latest python -c "import src.utils.common; print('Import successful')"
 
   # Kubernetes Manifest Validation
   kubernetes-validation:
@@ -421,7 +421,7 @@ jobs:
       run: |
         echo "Testing Databricks connection utilities..."
         python -c "
-        from utils.databricks.connection import DatabricksConnection, DatabricksConfig
+        from src.utils.databricks.connection import DatabricksConnection, DatabricksConfig
         from unittest.mock import Mock, patch
         
         # Mock the connection
@@ -445,7 +445,7 @@ jobs:
         echo "Testing data processing pipeline..."
         python -c "
         from scripts.data_processing.bronze_layer import BronzeLayerProcessor, SampleDataGenerator
-        from utils.common.validation import DataValidator
+        from src.utils.common.validation import DataValidator
         
         # Test bronze layer processing
         processor = BronzeLayerProcessor()
@@ -495,7 +495,7 @@ jobs:
         echo "Validating Delta Lake schemas..."
         python -c "
         import json
-        from utils.common.validation import SchemaValidator
+        from src.utils.common.validation import SchemaValidator
         
         # Initialize schema validator
         validator = SchemaValidator()
@@ -553,7 +553,7 @@ jobs:
       run: |
         echo "Testing schema validation with sample data..."
         python -c "
-        from utils.common.validation import SchemaValidator
+        from src.utils.common.validation import SchemaValidator
         from scripts.data_processing.bronze_layer import SampleDataGenerator
         
         # Initialize components
