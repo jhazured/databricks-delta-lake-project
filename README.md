@@ -67,7 +67,6 @@ databricks-delta-lake-project/
 ├── 📄 pylintrc                                   # Linting configuration
 ├── 📄 docker-compose.yml                         # Container orchestration
 ├── 📄 Dockerfile                                 # Container definition
-├── 📄 output.yaml                                # Output configuration
 │
 ├── 📁 .github/                                   # GitHub workflows and templates
 │   └── 📁 workflows/                            # CI/CD pipelines
